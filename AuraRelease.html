@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ΛURΛRELEΛSE // NNΛMDI MEDIΛ LΛBS</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap');
+
+        html, body, #canvas, #outerWrapper, #siteWrapper, .site-wrapper, 
+        .sections, .page-section, .content-wrapper, .sqs-layout, 
+        .sqs-block, .sqs-block-content, .sqs-col-12, .main-content, main, #main,
+        .sqs-block-code, .sqs-block-code .sqs-block-content, .sqs-block-alignment-wrapper {
+            background-color: #0A0A0A !important; margin: 0 auto !important; padding: 0 !important; box-sizing: border-box !important;
+        }
+        #header, #footer, header, footer, .header, .footer, 
+        .sqs-announcement-bar-dropzone, .mobile-nav-toggle, 
+        .sqs-mobile-info-bar, #headerWrapper, #footerWrapper, .header-announcement-bar-wrapper {
+            display: none !important; height: 0 !important; visibility: hidden !important; opacity: 0 !important;
+        }
+        :root { 
+            --bg-primary: #0A0A0A; 
+            --bg-surface: #121212; 
+            --border-color: #222222; 
+            --accent-silver: #E0E0E0; 
+            --accent-muted-silver: #888888; 
+            --accent-red: #CF6679; 
+            --accent-green: #03DAC6; 
+            --text-main: #FFFFFF; 
+            --text-muted: #666666; 
+            --font-main: 'Montserrat', sans-serif;
+        }
+        
+        .hud-body-container *, .sig-container * { box-sizing: border-box !important; max-width: 100% !important; }
+        .hud-body-container { 
+            background-color: var(--bg-primary) !important; color: var(--text-main); 
+            min-height: 100vh; width: 100% !important; max-width: 460px !important; 
+            margin: 0 auto !important; padding-bottom: 40px; display: block !important;
+            font-family: var(--font-main);
+        }
+        
+        .hud-header { padding: 30px 15px 20px 15px; border-bottom: 1px solid var(--border-color); text-align: center; background-color: #050505; }
+        .brand-title {
+            font-family: var(--font-main); font-weight: 800; font-size: 1.35rem; letter-spacing: 0.45em; text-indent: 0.45em;
+            background: linear-gradient(135deg, #555555 0%, #DDDDDD 25%, #FFFFFF 50%, #999999 75%, #444444 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: block; margin-bottom: 6px;
+        }
+        .brand-subtitle { font-family: var(--font-main); font-weight: 600; font-size: 0.48rem; letter-spacing: 0.3em; text-indent: 0.3em; color: #444444; text-transform: uppercase; display: block; }
+        
+        .hud-wrapper { width: 100%; max-width: 460px; margin: 0 auto; padding: 12px; }
+        .panel { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; margin-bottom: 12px; width: 100%; }
+        .panel-title { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; font-family: var(--font-main); }
+        .input-group { margin-bottom: 10px; width: 100%; }
+        label { display: block; font-size: 0.65rem; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; font-family: var(--font-main); font-weight: 600; }
+        
+        input.hud-in, select.hud-in, textarea.hud-in { 
+            width: 100% !important; max-width: 100% !important; background-color: var(--bg-primary); 
+            border: 1px solid var(--border-color); color: var(--text-main); padding: 10px; 
+            border-radius: 6px; font-size: 0.85rem; display: block; font-family: var(--font-main);
+        }
+        input[type="date"].hud-in::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+        input.hud-in:focus, select.hud-in:focus, textarea.hud-in:focus { outline: none; border-color: var(--accent-silver); }
+        input.hud-in[readonly] { color: var(--text-muted); border-style: dashed; background-color: rgba(0,0,0,0.2); cursor: not-allowed; }
+        
+        .grid-split { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .grid-triple { display: grid; grid-template-columns: 1.2fr 1fr 0.8fr; gap: 6px; margin-bottom: 10px; }
+        .sig-container { position: relative; width: 100%; aspect-ratio: 16/9; background-color: #000; border: 1px dashed var(--border-color); border-radius: 6px; overflow: hidden; margin-bottom: 8px; }
+        canvas.sig-pad-element { width: 100%; height: 100%; cursor: crosshair; touch-action: none; display: block; }
+        
+        .hud-btn {
+            font-family: var(--font-main);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            transition: opacity 0.2s ease, filter 0.2s ease;
+        }
+        .hud-btn:disabled { opacity: 0.3 !important; cursor: not-allowed !important; filter: grayscale(1); }
+        .hud-btn:hover:not(:disabled) { opacity: 0.9; }
+
+        .btn-submit { width: 100%; background-color: var(--text-main); color: var(--bg-primary); border: none; padding: 12px; font-weight: 700; font-size: 0.9rem; letter-spacing: 1px; }
+        .btn-silver-action { width: 100%; background-color: transparent; border: 1px solid var(--accent-silver); color: var(--accent-silver); padding: 12px; font-weight: 700; font-size: 0.8rem; letter-spacing: 1.5px; margin-bottom: 15px; }
+        
+        .btn-insignia-silver {
+            background: linear-gradient(135deg, #444444 0%, #999999 20%, #DDDDDD 45%, #FFFFFF 50%, #DDDDDD 55%, #999999 80%, #444444 100%) !important;
+            color: #0A0A0A !important;
+            font-weight: 800 !important;
+            border: none !important;
+        }
+        .btn-reset-thin {
+            width: 100%;
+            background-color: transparent !important;
+            border: 0.75px solid rgba(224, 224, 224, 0.3) !important;
+            color: var(--accent-muted-silver) !important;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            margin-bottom: 14px;
+        }
+        .btn-reset-thin:hover { border-color: var(--accent-silver) !important; color: var(--text-main) !important; }
+
+        .btn-decline-thick {
+            width: 100%;
+            background-color: transparent !important;
+            border: 3.5px solid var(--accent-red) !important;
+            color: var(--accent-red) !important;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .checkbox-container { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 15px; pointer-events: none; opacity: 0.4; }
+        .checkbox-container.unlocked { pointer-events: auto; opacity: 1; }
+        .checkbox-container input { margin-top: 2px; transform: scale(1.1); accent-color: var(--accent-silver); }
+        .checkbox-label { font-size: 0.68rem; color: var(--text-main); font-family: var(--font-main); line-height: 1.3; }
+
+        .scroll-notice-bar {
+            background-color: rgba(207, 102, 121, 0.15);
+            border: 1px dashed var(--accent-red);
+            color: var(--accent-red);
+            font-size: 0.65rem;
+            text-align: center;
+            padding: 6px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .legal-modal-overlay { 
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+            background-color: rgba(0, 0, 0, 0.95); z-index: 999999 !important; 
+            justify-content: center; align-items: center; padding: 16px; 
+        }
+        .legal-modal-content { 
+            background-color: var(--bg-surface); border: 1px solid var(--border-color); 
+            width: 100%; max-width: 440px; height: 80vh; border-radius: 12px; 
+            display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+        }
+        .legal-modal-header { padding: 20px; border-bottom: 1px solid var(--border-color); text-align: center; background-color: #050505; }
+        .legal-modal-title { font-family: var(--font-main); font-weight: 700; font-size: 0.85rem; letter-spacing: 2px; color: var(--accent-silver); text-transform: uppercase; line-height: 1.4; }
+        .legal-modal-body { padding: 24px; overflow-y: auto; flex-grow: 1; font-family: var(--font-main); font-size: 0.88rem; line-height: 1.6; color: #DDDDDD; border-bottom: 1px solid var(--border-color); font-weight: 500; text-align: left; }
+        .legal-modal-footer { padding: 15px; background-color: #050505; display: grid; gap: 8px; }
+        
+        .legal-section-header { font-size: 0.78rem; font-weight: 700; color: var(--accent-silver); margin-top: 18px; margin-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
+        .legal-paragraph { margin-bottom: 14px; text-align: justify; }
+    </style>
+    <script src="https://unpkg.com/libphonenumber-js@1.10.51/bundle/libphonenumber-max.js"></script>
+</head>
+<body>
+
+<div class="hud-body-container">
+    <div class="hud-header">
+        <span class="brand-title">ΛURΛRELEΛSE</span>
+        <span class="brand-subtitle" style="font-size: 0.8em;">NNΛMDI MEDIΛ LΛBS</span>
+        <span class="brand-subtitle" style="color: #888888;">Automated Talent Release Form</span>
+    </div>
+
+    <form id="releaseForm" class="hud-wrapper" autocomplete="off" onsubmit="commitModelReleaseTransaction(event);">
+        <div class="panel">
+            <div class="grid-split">
+                <div class="input-group"><label>First Name *</label><input type="text" id="first_name" name="first_name" class="hud-in" tabindex="1" required></div>
+                <div class="input-group"><label>Last Name *</label><input type="text" id="last_name" name="last_name" class="hud-in" tabindex="2" required></div>
+            </div>
+            <div class="grid-split">
+                <div class="input-group"><label>Birthdate *</label><input type="date" id="birthdate" name="birthdate" class="hud-in" tabindex="3" required></div>
+                <div class="input-group">
+                    <label>Country *</label>
+                    <select id="country" name="country" class="hud-in" tabindex="4" required>
+                        <option value="United States">United States</option>
+                        <option value="United Kingdom">United Kingdom</option>
+                        <option value="France">France</option>
+                        <option value="Italy">Italy</option>
+                        <option value="Brazil">Brazil</option>
+                        <option value="Canada">Canada</option>
+                        <option value="Japan">Japan</option>
+                        <option value="South Korea">South Korea</option>
+                        <option value="Australia">Australia</option>
+                        <option disabled>────────────────────</option>
+                        <option value="Afghanistan">Afghanistan</option><option value="Albania">Albania</option><option value="Algeria">Algeria</option><option value="Andorra">Andorra</option><option value="Angola">Angola</option><option value="Argentina">Argentina</option><option value="Armenia">Armenia</option><option value="Austria">Austria</option><option value="Azerbaijan">Azerbaijan</option><option value="Bahamas">Bahamas</option><option value="Bahrain">Bahrain</option><option value="Bangladesh">Bangladesh</option><option value="Barbados">Barbados</option><option value="Belarus">Belarus</option><option value="Belgium">Belgium</option><option value="Belize">Belize</option><option value="Benin">Benin</option><option value="Bhutan">Bhutan</option><option value="Bolivia">Bolivia</option><option value="Bosnia and Herzegovina">Bosnia and Herzegovina</option><option value="Botswana">Botswana</option><option value="Brunei">Brunei</option><option value="Bulgaria">Bulgaria</option><option value="Burkina Faso">Burkina Faso</option><option value="Burundi">Burundi</option><option value="Cambodia">Cambodia</option><option value="Cameroon">Cameroon</option><option value="Cape Verde">Cape Verde</option><option value="Central African Republic">Central African Republic</option><option value="Chad">Chad</option><option value="Chile">Chile</option><option value="China">China</option><option value="Colombia">Colombia</option><option value="Comoros">Comoros</option><option value="Congo">Congo</option><option value="Costa Rica">Costa Rica</option><option value="Croatia">Croatia</option><option value="Cuba">Cuba</option><option value="Cyprus">Cyprus</option><option value="Czech Republic">Czech Republic</option><option value="Denmark">Denmark</option><option value="Djibouti">Djibouti</option><option value="Dominica">Dominica</option><option value="Dominican Republic">Dominican Republic</option><option value="Ecuador">Ecuador</option><option value="Egypt">Egypt</option><option value="El Salvador">El Salvador</option><option value="Equatorial Guinea">Equatorial Guinea</option><option value="Eritrea">Eritrea</option><option value="Estonia">Estonia</option><option value="Eswatini">Eswatini</option><option value="Ethiopia">Ethiopia</option><option value="Fiji">Fiji</option><option value="Finland">Finland</option><option value="Gabon">Gabon</option><option value="Gambia">Gambia</option><option value="Georgia">Georgia</option><option value="Germany">Germany</option><option value="Ghana">Ghana</option><option value="Greece">Greece</option><option value="Grenada">Grenada</option><option value="Guatemala">Guatemala</option><option value="Guinea">Guinea</option><option value="Guyana">Guyana</option><option value="Haiti">Haiti</option><option value="Honduras">Honduras</option><option value="Hungary">Hungary</option><option value="Iceland">Iceland</option><option value="India">India</option><option value="Indonesia">Indonesia</option><option value="Iran">Iran</option><option value="Iraq">Iraq</option><option value="Ireland">Ireland</option><option value="Israel">Israel</option><option value="Jamaica">Jamaica</option><option value="Jordan">Jordan</option><option value="Kazakhstan">Kazakhstan</option><option value="Kenya">Kenya</option><option value="Kuwait">Kuwait</option><option value="Kyrgyzstan">Kyrgyzstan</option><option value="Laos">Laos</option><option value="Latvia">Latvia</option><option value="Lebanon">Lebanon</option><option value="Lesotho">Lesotho</option><option value="Liberia">Liberia</option><option value="Libya">Libya</option><option value="Liechtenstein">Liechtenstein</option><option value="Lithuania">Lithuania</option><option value="Luxembourg">Luxembourg</option><option value="Madagascar">Madagascar</option><option value="Malawi">Malawi</option><option value="Malaysia">Malaysia</option><option value="Maldives">Maldives</option><option value="Mali">Mali</option><option value="Malta">Malta</option><option value="Mauritania">Mauritania</option><option value="Mauritius">Mauritius</option><option value="Mexico">Mexico</option><option value="Moldova">Moldova</option><option value="Monaco">Monaco</option><option value="Mongolia">Mongolia</option><option value="Montenegro">Montenegro</option><option value="Morocco">Morocco</option><option value="Mozambique">Mozambique</option><option value="Myanmar">Myanmar</option><option value="Namibia">Namibia</option><option value="Nepal">Nepal</option><option value="Netherlands">Netherlands</option><option value="New Zealand">New Zealand</option><option value="Nicaragua">Nicaragua</option><option value="Niger">Niger</option><option value="Nigeria">Nigeria</option><option value="North Korea">North Korea</option><option value="North Macedonia">North Macedonia</option><option value="Norway">Norway</option><option value="Oman">Oman</option><option value="Pakistan">Pakistan</option><option value="Panama">Panama</option><option value="Paraguay">Paraguay</option><option value="Peru">Peru</option><option value="Philippines">Philippines</option><option value="Poland">Poland</option><option value="Portugal">Portugal</option><option value="Qatar">Qatar</option><option value="Romania">Romania</option><option value="Russia">Russia</option><option value="Rwanda">Rwanda</option><option value="Saudi Arabia">Saudi Arabia</option><option value="Senegal">Senegal</option><option value="Serbia">Serbia</option><option value="Singapore">Singapore</option><option value="Slovakia">Slovakia</option><option value="Slovenia">Slovenia</option><option value="South Africa">South Africa</option><option value="Spain">Spain</option><option value="Sri Lanka">Sri Lanka</option><option value="Sudan">Sudan</option><option value="Sweden">Sweden</option><option value="Switzerland">Switzerland</option><option value="Syria">Syria</option><option value="Taiwan">Taiwan</option><option value="Tanzania">Tanzania</option><option value="Thailand">Thailand</option><option value="Togo">Togo</option><option value="Trinidad and Tobago">Trinidad and Tobago</option><option value="Tunisia">Tunisia</option><option value="Turkey">Turkey</option><option value="Uganda">Uganda</option><option value="Ukraine">Ukraine</option><option value="United Arab Emirates">United Arab Emirates</option><option value="Uruguay">Uruguay</option><option value="Uzbekistan">Uzbekistan</option><option value="Venezuela">Venezuela</option><option value="Vietnam">Vietnam</option><option value="Yemen">Yemen</option><option value="Zambia">Zambia</option><option value="Zimbabwe">Zimbabwe</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid-split">
+                <div class="input-group"><label>Phone *</label><input type="text" id="model_phone" name="phone_number" class="hud-in" tabindex="5" required></div>
+                <div class="input-group"><label>Email *</label><input type="email" id="model_email" name="email" class="hud-in" tabindex="6" required></div>
+            </div>
+            <div class="input-group"><label>Portfolio URL</label><input type="url" id="model_portfolio" name="portfolio_url" class="hud-in" tabindex="7" placeholder="www.wilhelmina.com/your-name"></div>
+        </div>
+
+        <div class="panel">
+            <div class="grid-split">
+                <div class="input-group"><label>Street Address *</label><input type="text" id="street_address" name="street_address" class="hud-in" tabindex="8" required></div>
+                <div class="input-group"><label>Apt / Unit / Suite</label><input type="text" id="address_2" name="address_2" class="hud-in" tabindex="9"></div>
+            </div>
+            <div class="grid-triple">
+                <div class="input-group"><label>City *</label><input type="text" id="city" name="city" class="hud-in" tabindex="10" required></div>
+                <div class="input-group">
+                  <label id="label_state_province">State / Territory *</label>
+                  <select id="state_province_region" name="state_province_region" class="hud-in" tabindex="11" required>
+                      <option value="" disabled selected>Select State / Territory...</option>
+                      <option value="OH">OH - Ohio</option><option value="NY">NY - New York</option><option value="CA">CA - California</option><option value="KY">KY - Kentucky</option><option value="IN">IN - Indiana</option>
+                      <option disabled>────────────────────</option>
+                      <option value="AK">AK - Alaska</option><option value="AL">AL - Alabama</option><option value="AR">AR - Arkansas</option><option value="AS">AS - American Samoa</option><option value="AZ">AZ - Arizona</option><option value="CO">CO - Colorado</option><option value="CT">CT - Connecticut</option><option value="DC">DC - District of Columbia</option><option value="DE">DE - Delaware</option><option value="FL">FL - Florida</option><option value="GA">GA - Georgia</option><option value="GU">GU - Guam</option><option value="HI">HI - Hawaii</option><option value="IA">IA - Iowa</option><option value="ID">ID - Idaho</option><option value="IL">IL - Illinois</option><option value="KS">KS - Kansas</option><option value="LA">LA - Louisiana</option><option value="MA">MA - Massachusetts</option><option value="MD">MD - Maryland</option><option value="ME">ME - Maine</option><option value="MI">MI - Michigan</option><option value="MN">MN - Minnesota</option><option value="MO">MO - Missouri</option><option value="MP">MP - Northern Mariana Islands</option><option value="MS">MS - Mississippi</option><option value="MT">MT - Montana</option><option value="NC">NC - North Carolina</option><option value="ND">ND - North Dakota</option><option value="NE">NE - Nebraska</option><option value="NH">NH - New Hampshire</option><option value="NJ">NJ - New Jersey</option><option value="NM">NM - New Mexico</option><option value="NV">NV - Nevada</option><option value="OK">OK - Oklahoma</option><option value="OR">OR - Oregon</option><option value="PA">PA - Pennsylvania</option><option value="PR">PR - Puerto Rico</option><option value="RI">RI - Rhode Island</option><option value="SC">SC - South Carolina</option><option value="SD">SD - South Dakota</option><option value="TN">TN - Tennessee</option><option value="TX">TX - Texas</option><option value="UT">UT - Utah</option><option value="VA">VA - Virginia</option><option value="VI">VI - U.S. Virgin Islands</option><option value="VT">VT - Vermont</option><option value="WA">WA - Washington</option><option value="WI">WI - Wisconsin</option><option value="WV">WV - West Virginia</option><option value="WY">WY - Wyoming</option><option value="INTL">International / Foreign Region</option>
+                  </select>
+                </div>
+                <div class="input-group"><label id="label_postal_zip">Zip Code *</label><input type="text" id="postal_zip_code" name="postal_zip_code" class="hud-in" tabindex="12" required></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="grid-split">
+                <div class="input-group"><label>Signing Date</label><input type="text" id="signing_date" name="signing_date" class="hud-in" tabindex="13" readonly></div>
+                <div class="input-group"><label>Production Date *</label><input type="date" id="production_date" name="production_date" class="hud-in" tabindex="14" required></div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <button type="button" class="btn-silver-action hud-btn" tabindex="15" onclick="openLegalTermsModalPopup()">Review Legal Disclosure Terms</button>
+            
+            <div class="checkbox-container" id="terms_agree_wrapper">
+                <input type="checkbox" id="terms_agree" tabindex="16" disabled>
+                <div class="checkbox-label">I acknowledge that I have reviewed the required disclosure legal terms in the overlay window and explicitly accept them.</div>
+            </div>
+        
+            <div class="input-group" style="margin-top: 15px; margin-bottom: 8px;">
+                <div style="font-size: 0.58rem; color: var(--accent-muted-silver); font-family: var(--font-main); line-height: 1.4; text-transform: uppercase; letter-spacing: 0.5px; text-align: justify;">
+                    By executing this document digitally via the provided interface touch-mark drawing node, the signing party explicitly intends to be bound by the terms herein, acknowledging that this digital transaction fully complies with the federal Electronic Signatures in Global and National Commerce Act (E-SIGN) and the Uniform Electronic Transactions Act (UETA).
+                </div>
+            </div>
+        
+            <label id="label_signature_execution">Talent Authorization Signature *</label>
+            <div class="sig-container"><canvas id="sigPad" class="sig-pad-element"></canvas></div>
+            <button type="button" class="btn-reset-thin hud-btn" onclick="clearSignatureCanvas('primary')">Reset Signature</button>
+            
+        <div id="guardian_structural_block" style="display: none; border-top: 1px dashed var(--border-color); padding-top: 14px; margin-top: 14px;">
+            <div class="grid-split" style="margin-bottom:12px;">
+                <div class="input-group"><label style="color:var(--accent-silver);">Guardian First Name *</label><input type="text" id="guardian_first_name" name="guardian_first_name" class="hud-in" placeholder="First Name"></div>
+                <div class="input-group"><label style="color:var(--accent-silver);">Guardian Last Name *</label><input type="text" id="guardian_last_name" name="guardian_last_name" class="hud-in" placeholder="Last Name"></div>
+            </div>
+            <div class="grid-split" style="margin-bottom:12px;">
+                <div class="input-group"><label style="color:var(--accent-silver);">Guardian Email *</label><input type="email" id="guardian_email" name="guardian_email" class="hud-in" placeholder="guardian@example.com"></div>
+                <div class="input-group"><label style="color:var(--accent-silver);">Gov ID / Driver's License Ref *</label><input type="text" id="guardian_id_ref" name="guardian_id_ref" class="hud-in" placeholder="DL-12345678"></div>
+            </div>
+            <label style="color:var(--accent-silver);">Parent / Legal Guardian Authorization Signature *</label>
+            <div class="sig-container"><canvas id="guardianSigPad" class="sig-pad-element"></canvas></div>
+            <button type="button" class="btn-reset-thin hud-btn" onclick="clearSignatureCanvas('guardian')">Reset Guardian Signature</button>
+        </div>
+          
+            <button type="button" class="btn-submit btn-insignia-silver hud-btn" tabindex="17" onclick="commitModelReleaseTransaction(event)">Execute & Seal Record</button>
+        </div>
+    </form>
+</div>
+
+<div class="legal-modal-overlay" id="legalTermsModal">
+    <div class="legal-modal-content">
+        <div class="legal-modal-header">
+            <div class="legal-modal-title" id="modal_badge">TALENT RELEASE DETAILS</div>
+        </div>
+        <div class="legal-modal-body" id="modal_legal_viewport">
+            Please fill out the talent's identity parameters (First Name, Last Name, Birthdate, and Country) on the dashboard screen first to map the specific contractual terms.
+        </div>
+        <div class="legal-modal-footer">
+            <div class="scroll-notice-bar" id="scroll_notice">▼ Scroll to bottom of agreement to enable acceptance</div>
+            <button type="button" class="btn-submit btn-insignia-silver hud-btn" id="modal_accept_btn" disabled onclick="acceptLegalTermsModalPopup()">I Accept These Contractual Terms</button>
+            <button type="button" class="btn-decline-thick hud-btn" onclick="closeLegalTermsModalPopup()">Decline & Close</button>
+        </div>
+    </div>
+</div>
+
+<div class="legal-modal-overlay" id="successModal">
+    <div class="legal-modal-content" style="height: auto; max-height: 360px; text-align: center; padding: 32px;">
+        <div class="brand-title" style="font-size: 2.8rem; margin-bottom: 10px; font-family: var(--font-main); font-weight: 800; line-height: 1; -webkit-text-fill-color: unset; background: linear-gradient(135deg, #555555 0%, #DDDDDD 25%, #FFFFFF 50%, #999999 75%, #444444 100%); -webkit-background-clip: text; color: transparent; text-indent: 0;">✓</div>
+        <div class="legal-modal-title" style="margin-bottom: 12px; font-size: 0.95rem;">Record Transmitted & Sealed</div>
+        <div class="legal-modal-body" style="padding: 0; overflow: hidden; text-align: center; font-size: 0.8rem; line-height: 1.6; color: var(--accent-silver); margin-bottom: 25px; border: none;">
+            The release agreement has been executed and committed to the sovereign database. An electronic copy is being prepared for dispatch to your email.
+        </div>
+        <button type="button" class="btn-submit btn-insignia-silver hud-btn" onclick="dismissSuccessAndScrollTop()">Dismiss & Reset</button>
+    </div>
+</div>
+
+<script>
+    const SB_URL = "https://vpqglsjocmqrsgsmetip.supabase.co";
+    const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwcWdsc2pvY21xcnNnc21ldGlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNDkyNTMsImV4cCI6MjA5NzgyNTI1M30.zPnr72oc9aOsfomeFY7M8KqBSy68onvhfBxhBtrzwZs";
+
+    const LEGAL_MATRIX = {
+        "ADULT_UNITED_STATES": `
+            <div class="legal-section-header">1. Media Grant & Clearance Node</div>
+            <div class="legal-paragraph">Model Release Form Agreement: <strong>{{Talent_Name}}</strong> (herein “Model”), for good and valuable consideration, the receipt of which is acknowledged, hereby grants to Nnamdi Media Consultants, dba Nnamdi Media (herein “Company”), its legal representatives, assignees, and those acting under its authority, the irrevocable, perpetual, and unrestricted right and permission to take, use, re-use, copyright, publish and/or republish photographic portraits or pictures of the Model (herein "Work"), and the negatives, transparencies, prints, or digital information pertaining to them, in still, single, multiple, moving, or video format, or in which Model may be included in whole, in part, in composite, or distorted in character or form, or reproductions thereof, in color or otherwise, made on the behalf of Company, in any and all media known now or hereafter, specifically including but not limited to print media and distribution over the internet for illustration, promotion, art, editorial, advertising, trade, or any other lawful purpose whatsoever.</div>
+            <div class="legal-paragraph">The rights granted herein explicitly encompass the right to utilize the Work, including the Model’s physical features, voice, and facial geometry, in connection with artificial intelligence systems, machine learning models, computational photography, neural rendering, computer vision training, and the generation of synthetic media, machine learning training weights, or digital replicas.</div>
+            <div class="legal-section-header">2. Inspection Waiver Oversight</div>
+            <div class="legal-paragraph">Model hereby relinquishes any right they may have to examine or approve the finished product or products or the advertising copy or printed matter that may be used in connection with Work which Company created with Model, or the use to which it may be applied.</div>
+            <div class="legal-section-header">3. Intellectual Property Limits</div>
+            <div class="legal-paragraph">Model waives any ownership and publication right to which they might be entitled in connection with Work, with the exception of the personal use of Work as part of personal modeling portfolio. Model agrees they have no right to sell, license or publish any Work to any person or entity.</div>
+            <div class="legal-section-header">4. Remuneration & Indemnity Protocol</div>
+            <div class="legal-paragraph">Model further releases Company, its parent company, subsidiaries, affiliates, officers, agents, servants, or employees (herein “Releasees”) from any claims for remuneration associated with any form of damage, foreseen or unforeseen, associated with the proper commercial or artistic use of Work unless it can be shown that said reproduction was maliciously caused, produced and published for the sole purpose of subjecting the Model to conspicuous ridicule, scandal, reproach, scorn and indignity. Model also waives any and all claims, demands, actions and causes of action whatsoever arising out of or related to any loss, damage, or injury, that may be sustained by Model, or any of the property belonging to Model, whether caused by the negligence of the Releasees, or otherwise, while performing the photography session, or while in, on or upon the premises where the photography session was performed.</div>
+            <div class="legal-section-header">5. Execution Authorization Credentials</div>
+            <div class="legal-paragraph">It is the express intent of Model that this document shall bind all members of Model’s family, heirs, assignees, and personal representatives. Model represents that they are of adult age at signing and have the right to contract in their own name. Model acknowledges the authorization and agreement of this Release, prior to its execution, and that the photography session was conducted in a completely proper and highly professional manner.</div>
+            <div class="legal-section-header">6. Governing Law & Jurisdiction Framework</div>
+            <div class="legal-paragraph">This Agreement shall be governed by and construed in accordance with the laws of the State of Ohio, United States, without regard to its conflict of law principles. The Model explicitly consents and submits to the exclusive personal jurisdiction and venue of the state and federal courts located in Cincinnati, Ohio, for any legal action or dispute arising out of this Agreement, its execution, or the subsequent commercial deployment of the Work.</div>
+        `,
+        "ADULT_INTERNATIONAL": `
+            <div class="legal-section-header">Global Asset Clearances Specification [ADULT]</div>
+            <div class="legal-paragraph">Model grants to Nnamdi Media Consultants, dba Nnamdi Media (“Company”), its assignees and global deployment networks, the unrestricted, perpetual right to publish, republish, and distribute Work over any global internet infrastructures, satellite transmissions, or syndication frameworks now known or hereafter created. Model waives all global remuneration and validation oversight permissions under international intellectual property treaties, fully discharging Releasees across all international planetary jurisdictions.</div>
+            <div class="legal-paragraph">This grant explicitly includes machine learning training and synthetic replica rights. This instrument is governed strictly under the laws of the State of Ohio, USA, with exclusive legal venue assigned to Cincinnati, Ohio.</div>
+        `,
+        "MINOR_UNITED_STATES": `
+            <div class="legal-section-header">1. Primary Contracting Principal & Grant</div>
+            <div class="legal-paragraph">The undersigned Parent/Legal Guardian (herein “Guardian”), acting as Primary Contracting Principal on behalf of the minor subject <strong>{{Minor_Name}}</strong> (herein “Minor”), for good and valuable consideration, grants to Nnamdi Media Consultants, dba Nnamdi Media (herein “Company”), its assignees, and corporate licensees, the irrevocable, perpetual, and unrestricted right to capture, copyright, publish, and commercially exploit visual assets, digital information, and moving video formats of Minor (herein "Work") across all global media now known or hereafter developed.</div>
+            <div class="legal-paragraph">This grant explicitly encompasses rights to process Work within machine learning models, neural rendering, computational photography, digital replicas, and synthetic media generation pipelines.</div>
+            <div class="legal-section-header">2. Post-Majority Ratification & Guardian Indemnification</div>
+            <div class="legal-paragraph">Guardian warrants sole legal authority to execute this instrument and affirms that consideration provided directly benefits Minor. Guardian covenants that upon reaching the age of majority (18 years), Minor shall not disaffirm, rescind, or void this Release. Guardian agrees to irrevocably defend, indemnify, and hold harmless Company and its enterprise licensees against any claims, disaffirmations, or demands asserted by Minor upon or after reaching majority.</div>
+            <div class="legal-section-header">3. Inspection Waiver & Liability Clearance</div>
+            <div class="legal-paragraph">Guardian waives all inspection rights, approval permissions, and residual royalty claims associated with Work. Guardian fully discharges Company and its officers from any claims for loss, injury, or liability sustained during production.</div>
+            <div class="legal-section-header">4. Governing Law & Jurisdiction</div>
+            <div class="legal-paragraph">This Agreement is executed under and governed strictly by the laws of the State of Ohio, USA. Guardian and Minor submit to the exclusive venue of state and federal courts in Cincinnati, Ohio.</div>
+        `,
+        "MINOR_INTERNATIONAL": `
+            <div class="legal-section-header">1. Primary Contracting Principal & Global Media Grant</div>
+            <div class="legal-paragraph">The undersigned Parent/Legal Guardian (herein “Guardian”), acting as Primary Contracting Principal on behalf of minor subject <strong>{{Minor_Name}}</strong> (herein “Minor”), hereby grants to Nnamdi Media Consultants, dba Nnamdi Media (herein “Company”), its global assignees, and enterprise licensees, the irrevocable, perpetual, worldwide, and unrestricted right to capture, copyright, publish, syndicate, and commercially exploit visual assets, digital information, and moving video formats of Minor (herein "Work") across all cross-border networks, satellite arrays, and global media infrastructures.</div>
+            <div class="legal-paragraph">This grant explicitly encompasses international rights for computational processing, machine learning models, neural rendering, facial geometry analysis, digital replicas, and synthetic media generation pipelines.</div>
+            <div class="legal-section-header">2. Post-Majority Ratification & Cross-Border Indemnification</div>
+            <div class="legal-paragraph">Guardian warrants full legal authority under applicable local, national, and international laws to execute this instrument, affirming consideration directly benefits Minor. Guardian covenants that upon reaching the age of majority under local or foreign jurisdiction, Minor shall not disaffirm, rescind, or void this Release. Guardian agrees to irrevocably defend, indemnify, and hold harmless Company and its enterprise licensees against any foreign or domestic claims, disaffirmations, or demands asserted by Minor.</div>
+            <div class="legal-section-header">3. International Privacy & Regulatory Waiver (GDPR / AI Compliance)</div>
+            <div class="legal-paragraph">Guardian grants explicit parental consent under EU GDPR (Article 8), UK GDPR, and international biometrics frameworks for global cross-border data transfer and processing. Guardian waives all moral rights, inspection approvals, and global residual royalty claims.</div>
+            <div class="legal-section-header">4. Governing Law & Exclusive Venue</div>
+            <div class="legal-paragraph">Regardless of Minor's or Guardian's country of residence or location of production, this instrument is executed under and governed strictly by the laws of the State of Ohio, USA. Guardian and Minor explicitly submit to the exclusive venue of state and federal courts in Cincinnati, Ohio, USA for all cross-border disputes.</div>
+        `
+    };
+
+    const sigCanvas = document.getElementById('sigPad');
+    const sigCtx = sigCanvas.getContext('2d');
+    const guardianCanvas = document.getElementById('guardianSigPad');
+    const guardianCtx = guardianCanvas.getContext('2d');
+
+    let computedClassification = "ADULT";
+    let computedJurisdiction = "UNITED_STATES";
+    let sigStrokePoints = 0;
+    let guardianStrokePoints = 0;
+
+    function attachPointerDrawingEngine(canvasElem, context, traceSetter) {
+        let isDrawing = false;
+        let lastX = 0, lastY = 0;
+
+        function ensureResolution() {
+            const rect = canvasElem.getBoundingClientRect();
+            if (rect.width > 0 && rect.height > 0 && (canvasElem.width !== Math.floor(rect.width) || canvasElem.height !== Math.floor(rect.height))) {
+                canvasElem.width = Math.floor(rect.width);
+                canvasElem.height = Math.floor(rect.height);
+                context.strokeStyle = '#E0E0E0';
+                context.lineWidth = 2.5;
+                context.lineCap = 'round';
+                context.lineJoin = 'round';
+            }
+        }
+
+        function getCoords(e) {
+            const rect = canvasElem.getBoundingClientRect();
+            return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+        }
+
+        canvasElem.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            ensureResolution();
+            isDrawing = true;
+            try { canvasElem.setPointerCapture(e.pointerId); } catch(err){}
+            const coords = getCoords(e);
+            lastX = coords.x; lastY = coords.y;
+            traceSetter();
+        });
+
+        canvasElem.addEventListener('pointermove', (e) => {
+            if (!isDrawing) return;
+            e.preventDefault();
+            const coords = getCoords(e);
+            context.beginPath();
+            context.moveTo(lastX, lastY);
+            context.lineTo(coords.x, coords.y);
+            context.stroke();
+            lastX = coords.x; lastY = coords.y;
+            traceSetter();
+        });
+
+        const stopDrawing = (e) => {
+            if (isDrawing) {
+                isDrawing = false;
+                try { canvasElem.releasePointerCapture(e.pointerId); } catch(err){}
+            }
+        };
+
+        canvasElem.addEventListener('pointerup', stopDrawing);
+        canvasElem.addEventListener('pointercancel', stopDrawing);
+    }
+
+    function initializeFormEngine() {
+        const localDate = new Date();
+        const signingField = document.getElementById('signing_date');
+        if (signingField) { signingField.value = localDate.toLocaleDateString('en-US'); }
+        
+        const isoTodayStr = new Date(localDate.getTime() - (localDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+        const prodField = document.getElementById('production_date');
+        if (prodField && !prodField.value) { prodField.value = isoTodayStr; }
+
+        attachPointerDrawingEngine(sigCanvas, sigCtx, () => sigStrokePoints++);
+        attachPointerDrawingEngine(guardianCanvas, guardianCtx, () => guardianStrokePoints++);
+
+        const modalViewport = document.getElementById('modal_legal_viewport');
+        const modalAcceptBtn = document.getElementById('modal_accept_btn');
+        const scrollNotice = document.getElementById('scroll_notice');
+
+        modalViewport.addEventListener('scroll', () => {
+            const isBottom = modalViewport.scrollHeight - modalViewport.scrollTop <= modalViewport.clientHeight + 15;
+            if (isBottom) {
+                modalAcceptBtn.disabled = false;
+                scrollNotice.style.display = 'none';
+            }
+        });
+
+        autoPopulateFromUrlParameters();
+        evaluateAgeAndRoutingEngine();
+    }
+
+    function autoPopulateFromUrlParameters() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const map = {
+            'fname': 'first_name', 'first_name': 'first_name', 
+            'lname': 'last_name', 'last_name': 'last_name', 
+            'email': 'model_email', 'phone': 'model_phone', 
+            'portfolio': 'model_portfolio', 'address': 'street_address',
+            'address2': 'address_2', 'city': 'city', 
+            'state': 'state_province_region', 'zip': 'postal_zip_code', 
+            'country': 'country', 'birthdate': 'birthdate'
+        };
+
+        for (const [param, fieldId] of Object.entries(map)) {
+            if (urlParams.has(param)) {
+                const elem = document.getElementById(fieldId);
+                if (elem) elem.value = urlParams.get(param);
+            }
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        window.addEventListener('DOMContentLoaded', initializeFormEngine);
+    } else {
+        initializeFormEngine();
+    }
+
+    function openLegalTermsModalPopup() { 
+        evaluateAgeAndRoutingEngine(); 
+        const modalViewport = document.getElementById('modal_legal_viewport');
+        const modalAcceptBtn = document.getElementById('modal_accept_btn');
+        const scrollNotice = document.getElementById('scroll_notice');
+
+        if (modalViewport) { modalViewport.scrollTop = 0; }
+        if (modalAcceptBtn) { modalAcceptBtn.disabled = true; }
+        if (scrollNotice) { scrollNotice.style.display = 'block'; }
+
+        document.getElementById('legalTermsModal').style.display = 'flex'; 
+    }
+
+    function closeLegalTermsModalPopup() { document.getElementById('legalTermsModal').style.display = 'none'; }
+    
+    function acceptLegalTermsModalPopup() {
+        const cb = document.getElementById('terms_agree'); 
+        const cbWrapper = document.getElementById('terms_agree_wrapper');
+        cb.checked = true; 
+        cbWrapper.classList.add('unlocked'); 
+        closeLegalTermsModalPopup();
+    }
+
+    function dismissSuccessAndScrollTop() { document.getElementById('successModal').style.display = 'none'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+    function clearSignatureCanvas(type) {
+        if (type === 'primary') { 
+            sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height); 
+            sigStrokePoints = 0; 
+        } else { 
+            guardianCtx.clearRect(0, 0, guardianCanvas.width, guardianCanvas.height); 
+            guardianStrokePoints = 0; 
+        }
+    }
+
+    const formContainer = document.getElementById('releaseForm');
+    const dispatchEvaluationSequence = () => { evaluateAgeAndRoutingEngine(); };
+    formContainer.addEventListener('input', dispatchEvaluationSequence);
+    formContainer.addEventListener('change', dispatchEvaluationSequence);
+
+    function evaluateAgeAndRoutingEngine() {
+        const bdateVal = document.getElementById('birthdate').value;
+        const countryVal = document.getElementById('country').value || "United States";
+        const labelStateProvince = document.getElementById('label_state_province');
+        const labelPostalZip = document.getElementById('label_postal_zip');
+        
+        if (countryVal.trim().toLowerCase() === "united states" || countryVal.trim().toLowerCase() === "us") {
+            labelStateProvince.innerText = "State / Territory *"; 
+            labelPostalZip.innerText = "Zip Code *"; 
+            computedJurisdiction = "UNITED_STATES";
+        } else {
+            labelStateProvince.innerText = "Province / Region *"; 
+            labelPostalZip.innerText = "Postal Code *"; 
+            computedJurisdiction = "INTERNATIONAL";
+        }
+
+        const parts = bdateVal ? bdateVal.split('-') : [];
+        const birthDate = parts.length === 3 ? new Date(parts[0], parts[1] - 1, parts[2]) : new Date();
+        const today = new Date();
+        
+        let age = bdateVal ? (today.getFullYear() - birthDate.getFullYear()) : 25;
+        const m = today.getMonth() - birthDate.getMonth();
+        if (bdateVal && (m < 0 || (m === 0 && today.getDate() < birthDate.getDate()))) { age--; }
+
+        computedClassification = (isNaN(age) || age < 18) ? "MINOR" : "ADULT";
+        const lookupToken = `${computedClassification}_${computedJurisdiction}`;
+        
+        let fName = document.getElementById('first_name').value.trim();
+        let lName = document.getElementById('last_name').value.trim();
+        let fullName = `${fName} ${lName}`.trim() || "{{Talent_Name}}";
+        
+        let currentText = LEGAL_MATRIX[lookupToken] || LEGAL_MATRIX["ADULT_UNITED_STATES"];
+        
+        if (computedClassification === "MINOR") {
+            let gfName = document.getElementById('guardian_first_name').value.trim() || "{{Guardian_Name}}";
+            let glName = document.getElementById('guardian_last_name').value.trim() || "";
+            let guardianFullName = `${gfName} ${glName}`.trim();
+            currentText = currentText.replace(/{{Minor_Name}}/g, fullName).replace(/{{Talent_Name}}/g, fullName).replace(/{{Guardian_Name}}/g, guardianFullName);
+        } else {
+            currentText = currentText.replace(/{{Talent_Name}}/g, fullName);
+        }
+        
+        const displayJurisdiction = computedJurisdiction === "UNITED_STATES" ? "United States" : "International";
+        document.getElementById('modal_badge').innerHTML = `TALENT RELEASE DETAILS<br><span style="font-size: 0.72rem; color: var(--accent-silver); text-transform: uppercase; font-weight: 800;">${computedClassification} (${displayJurisdiction})</span>`;
+        document.getElementById('modal_legal_viewport').innerHTML = currentText;
+        
+        const gBlock = document.getElementById('guardian_structural_block');
+        const signatureLabel = document.getElementById('label_signature_execution');
+
+        if (computedClassification === "MINOR") {
+            signatureLabel.innerText = "Minor Authorization Mark / Signature *";
+            gBlock.style.display = "block";
+        } else {
+            signatureLabel.innerText = "Talent Authorization Signature *"; 
+            gBlock.style.display = "none";
+        }
+    }
+
+// Dynamic Country Name to ISO 3166-1 Alpha-2 Code Converter
+function getIsoFromCountryName(countryName) {
+  if (!countryName) return "US";
+  
+  // Native browser lookup engine for region codes
+  const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
+  const normalizedInput = countryName.trim().toLowerCase();
+
+  // Common overrides for non-standard select option labels
+  if (normalizedInput === "united states" || normalizedInput === "us") return "US";
+  if (normalizedInput === "united kingdom" || normalizedInput === "uk") return "GB";
+
+  // Scan standard ISO codes dynamically (A-Z)
+  for (let i = 65; i <= 90; i++) {
+    for (let j = 65; j <= 90; j++) {
+      const code = String.fromCharCode(i, j);
+      try {
+        const name = regionNames.of(code);
+        if (name && name.toLowerCase() === normalizedInput) {
+          return code;
+        }
+      } catch (e) {
+        // Skip invalid/unassigned ISO pairs
+      }
+    }
+  }
+  return "US"; // Default fallback
+}
+
+function formatAndVerifyE164(rawPhone, fallbackCountryName) {
+  if (!rawPhone || !rawPhone.trim()) return null;
+
+  const defaultIso = getIsoFromCountryName(fallbackCountryName);
+
+  try {
+    const phoneNumber = libphonenumber.parsePhoneNumberFromString(rawPhone.trim(), defaultIso);
+    if (phoneNumber && phoneNumber.isValid()) {
+      return phoneNumber.number; // Returns standardized E.164 (e.g. "+525512345678")
+    }
+    return null;
+  } catch (err) {
+    return null;
+  }
+}
+  
+    async function commitModelReleaseTransaction(event) {
+        if (event && event.preventDefault) { event.preventDefault(); }
+    
+        const formData = new FormData(formContainer);
+        const rawInputs = Object.fromEntries(formData.entries());
+    
+        // Validate phone input against global telco standards
+        const validatedPhone = formatAndVerifyE164(rawInputs.phone_number, rawInputs.country);
+        if (!validatedPhone) {
+            return alert("Verification Error: Enter a valid phone number including country code (e.g., +1..., +44..., +52...).");
+        }
+    
+        if(!rawInputs.first_name || !rawInputs.last_name || !rawInputs.birthdate || !rawInputs.email?.includes('@')) {
+            return alert("Execution Aborted: Complete identity parameters before execution.");
+        }
+        if(sigStrokePoints < 50) {
+            return alert("Verification Error: Signature trace incomplete.");
+        }
+
+        evaluateAgeAndRoutingEngine();
+
+        const normalizedCountry = (rawInputs.country || "United States").trim().toLowerCase();
+        const countryKey = (normalizedCountry === "united states" || normalizedCountry === "us") ? "UNITED_STATES" : "INTERNATIONAL";
+        const lookupToken = `${computedClassification}_${countryKey}`;
+        
+        let rawMatrixTemplate = LEGAL_MATRIX[lookupToken] || LEGAL_MATRIX["ADULT_UNITED_STATES"];
+        const fullName = `${rawInputs.first_name} ${rawInputs.last_name}`.trim();
+        let populatedTemplate = rawMatrixTemplate.replace(/{{Talent_Name}}/g, fullName).replace(/{{Minor_Name}}/g, fullName);
+        
+        if (computedClassification === "MINOR") {
+            const gName = `${rawInputs.guardian_first_name || ''} ${rawInputs.guardian_last_name || ''}`.trim();
+            populatedTemplate = populatedTemplate.replace(/{{Guardian_Name}}/g, gName);
+        }
+
+        const parserDiv = document.createElement("div");
+        parserDiv.innerHTML = populatedTemplate;
+        const cleanContractBody = parserDiv.innerText || parserDiv.textContent || LEGAL_MATRIX["ADULT_UNITED_STATES"];
+
+        const isMinor = computedClassification === "MINOR";
+        
+        const sanitizedPayload = {
+            first_name: rawInputs.first_name.trim(),
+            last_name: rawInputs.last_name.trim(),
+            birthdate: rawInputs.birthdate,
+            country: rawInputs.country || "United States",
+            phone_number: validatedPhone, // Uses verified E.164 string
+            email: rawInputs.email.toLowerCase().trim(),
+            portfolio_url: rawInputs.portfolio_url?.trim() || null,
+            street_address: rawInputs.street_address?.trim() || null,
+            address_2: rawInputs.address_2?.trim() || null,
+            city: rawInputs.city?.trim() || null,
+            state_province_region: rawInputs.state_province_region?.trim() || null,
+            postal_zip_code: rawInputs.postal_zip_code?.trim() || null,
+            signing_date: rawInputs.signing_date || new Date().toISOString().split('T')[0],
+            production_date: rawInputs.production_date || new Date().toISOString().split('T')[0],
+            classification: computedClassification,
+            jurisdiction: countryKey,
+            signature_base64: sigCanvas.toDataURL('image/png'),
+            legal_contract_body: cleanContractBody,
+            user_agent: navigator.userAgent,
+            status_clearance: "SIGNED_DIRECT_STREAM_VERIFIED",
+            
+            // Schema Alignment Additions
+            is_minor: isMinor,
+            status: isMinor ? "COMPLETED" : "COMPLETED" // Flip to "PENDING_GUARDIAN" if enabling async flow
+        };
+        
+        if (isMinor) {
+            if(!rawInputs.guardian_first_name || !rawInputs.guardian_last_name || !rawInputs.guardian_email || !rawInputs.guardian_id_ref || guardianStrokePoints < 50) {
+                return alert("Verification Error: Complete Guardian identity details (Name, Email, Gov ID Ref) and signature canvas before execution.");
+            }
+            const gSigDataUrl = guardianCanvas.toDataURL('image/png');
+            sanitizedPayload.guardian_first_name = rawInputs.guardian_first_name.trim();
+            sanitizedPayload.guardian_last_name = rawInputs.guardian_last_name.trim();
+            sanitizedPayload.guardian_email = rawInputs.guardian_email.toLowerCase().trim();
+            sanitizedPayload.guardian_id_ref = rawInputs.guardian_id_ref.trim();
+            sanitizedPayload.guardian_sig_vector = gSigDataUrl;
+            sanitizedPayload.guardian_signature_base64 = gSigDataUrl;
+        }
+
+        try {
+            let res = await fetch(`${SB_URL}/rest/v1/model_releases?apikey=${SB_KEY}`, {
+                method: 'POST', 
+                headers: { 
+                    'apikey': SB_KEY, 
+                    'Authorization': `Bearer ${SB_KEY}`, 
+                    'Content-Type': 'application/json', 
+                    'Prefer': 'return=minimal' 
+                },
+                body: JSON.stringify(sanitizedPayload)
+            });
+
+            if(res.ok) { 
+                const fullContactName = `${sanitizedPayload.first_name} ${sanitizedPayload.last_name}`;
+                const fullAddr = `${sanitizedPayload.street_address || ''}${sanitizedPayload.address_2 ? ' ' + sanitizedPayload.address_2 : ''}, ${sanitizedPayload.city || ''}, ${sanitizedPayload.state_province_region || ''} ${sanitizedPayload.postal_zip_code || ''}`;
+                
+                await fetch(`${SB_URL}/rest/v1/platform_contacts?apikey=${SB_KEY}`, {
+                    method: 'POST',
+                    headers: { 
+                        'apikey': SB_KEY, 
+                        'Authorization': `Bearer ${SB_KEY}`, 
+                        'Content-Type': 'application/json', 
+                        'Prefer': 'resolution=merge-duplicates' 
+                    },
+                    body: JSON.stringify({
+                        full_name: fullContactName,
+                        email: sanitizedPayload.email,
+                        phone: sanitizedPayload.phone_number,
+                        address: fullAddr,
+                        website: sanitizedPayload.portfolio_url,
+                        location_met: `Model Release Production (${sanitizedPayload.production_date})`,
+                        ecosystem_target: 'NMC',
+                        connection_rationale: `Executed Model Release [${computedClassification} / ${countryKey}]`,
+                        created_at: new Date().toISOString()
+                    })
+                });
+
+                document.getElementById('successModal').style.display = 'flex';
+                formContainer.reset();
+                clearSignatureCanvas('primary'); 
+                clearSignatureCanvas('guardian');
+                document.getElementById('terms_agree').checked = false;
+                document.getElementById('terms_agree_wrapper').classList.remove('unlocked');
+                
+                const resetDate = new Date();
+                document.getElementById('signing_date').value = resetDate.toLocaleDateString('en-US');
+                const isoResetStr = new Date(resetDate.getTime() - (resetDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+                document.getElementById('production_date').value = isoResetStr;
+                evaluateAgeAndRoutingEngine();
+            } else { 
+                const errorData = await res.json().catch(() => null);
+                alert(`Database Rejected Ingestion:\n\nError Code: ${errorData?.code}\nMessage: ${errorData?.message}`);
+            }
+        } catch (err) { 
+            alert(`Network Transmission Exception: ${err.message}`); 
+        }
+    }
+</script>
+</body>
+</html>

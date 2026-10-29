@@ -1,0 +1,1294 @@
+<!-- ΛURΛLENS: SECURED ASSET INGESTION CORE [KERNEL v8.0] -->
+<script src="https://unpkg.com/@supabase/supabase-js@2.39.8/dist/umd/supabase.js"></script>
+<script src="https://unpkg.com/tesseract.js@5/dist/tesseract.min.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&display=swap');
+
+html,body,#canvas,#outerWrapper,#siteWrapper,.site-wrapper,.sections,.page-section,
+.content-wrapper,.sqs-layout,.sqs-block,.sqs-block-content,.sqs-col-12,.main-content,
+main,#main,.sqs-block-code,.sqs-block-code .sqs-block-content,.sqs-block-alignment-wrapper{
+  background-color:#0A0A0A!important;margin:0 auto!important;padding:0!important;box-sizing:border-box!important}
+#header,#footer,header,footer,.header,.footer,.sqs-announcement-bar-dropzone,
+.mobile-nav-toggle,.sqs-mobile-info-bar,#headerWrapper,#footerWrapper,
+.header-announcement-bar-wrapper{
+  display:none!important;height:0!important;visibility:hidden!important;
+  opacity:0!important;pointer-events:none!important}
+:root{
+  --bg-primary:#0A0A0A;--bg-surface:#121212;--border-color:#262626;
+  --accent-silver:#CECECE;--accent-red:#CF6679;--accent-green:#03DAC6;
+  --text-main:#FFFFFF;--text-muted:#666666;
+  --silver-shimmer:linear-gradient(135deg,#4A4A4A 0%,#9A9A9A 25%,#E5E5E5 45%,
+    #FFFFFF 50%,#E5E5E5 55%,#9A9A9A 75%,#4A4A4A 100%)}
+.hud-body-container{
+  background-color:var(--bg-primary)!important;color:var(--text-main);
+  min-height:100vh;width:100vw!important;max-width:460px!important;
+  margin:0 auto!important;padding-bottom:40px;display:block!important;
+  position:relative;font-family:'Montserrat',sans-serif}
+.hud-header{padding:10px 15px 14px;border-bottom:1px solid var(--border-color);
+  text-align:center;background-color:#050505}
+.hud-wrapper{width:100%;max-width:460px;margin:0 auto;padding:12px;
+  position:relative;box-sizing:border-box}
+.input-group{margin-bottom:14px;width:100%;display:block;box-sizing:border-box}
+.input-group label{
+  display:block!important;font-size:.62rem!important;color:var(--accent-silver)!important;
+  margin:0 0 6px!important;text-transform:uppercase!important;font-weight:700!important;
+  letter-spacing:1.5px!important;opacity:.85}
+input.hud-in,select.hud-in,textarea.hud-in{
+  width:100%!important;background-color:rgba(10,10,10,.8)!important;
+  border:1px solid var(--border-color);color:var(--text-main)!important;
+  padding:10px 12px!important;border-radius:6px!important;font-size:.82rem!important;
+  display:block!important;font-family:'Montserrat',sans-serif!important;
+  box-sizing:border-box!important;transition:border-color .25s ease,box-shadow .25s ease}
+input.hud-in:focus,select.hud-in:focus,textarea.hud-in:focus{
+  border-color:#FFFFFF!important;box-shadow:0 0 10px rgba(255,255,255,.15)!important}
+textarea.hud-in{resize:vertical;min-height:60px}
+.auth-overlay-panel{
+  display:flex;flex-direction:column;gap:4px;padding:20px 24px;margin-top:15px;
+  background:rgba(18,18,18,.80)!important;backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.1);border-radius:12px;
+  box-shadow:0 24px 50px rgba(0,0,0,.6)}
+.brand-title{
+  font-family:'Montserrat',sans-serif;font-weight:700;font-size:1.35rem;
+  letter-spacing:.45em;text-indent:.45em;background:var(--silver-shimmer);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  display:block;margin-bottom:4px}
+.brand-subtitle{
+  font-weight:600;font-size:.48rem;letter-spacing:.3em;text-indent:.3em;
+  color:var(--text-muted);text-transform:uppercase;display:block}
+.viewfinder-wrapper{
+  position:relative;width:100%;aspect-ratio:4/3;background-color:#000;
+  border-radius:8px;overflow:hidden;border:1px solid var(--border-color);
+  margin-bottom:12px;cursor:pointer}
+video#webcam{width:100%;height:100%;object-fit:cover;background-color:#000}
+.scanner-overlay{
+  position:absolute;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;display:flex;align-items:center;justify-content:center}
+.target-box{
+  width:85%;height:65%;border:1px solid rgba(255,255,255,.2);
+  border-radius:6px;position:relative;overflow:hidden;transition:all .3s ease}
+.locked .target-box{border-color:var(--accent-green);background-color:rgba(3,218,198,.05)}
+.countdown-indicator{
+  position:absolute;bottom:12px;left:0;width:100%;text-align:center;
+  font-size:.65rem;font-weight:700;color:var(--accent-silver);
+  text-transform:uppercase;letter-spacing:2px;opacity:0;transition:all .3s ease;z-index:10}
+.tracking .countdown-indicator{opacity:1}
+.emerald-beacon{
+  position:absolute;top:12px;right:12px;width:8px;height:8px;border-radius:50%;
+  background-color:var(--accent-green);box-shadow:0 0 10px var(--accent-green);
+  opacity:0;transition:opacity .3s ease;z-index:150;cursor:pointer}
+.emerald-beacon.active{opacity:1;animation:beaconPulse 2s infinite ease-in-out}
+@keyframes beaconPulse{0%,100%{opacity:.3;transform:scale(.9)}50%{opacity:1;transform:scale(1.2)}}
+.viewport-toast{
+  position:absolute;top:16px;left:50%;transform:translateX(-50%) translateY(-10px);
+  background:rgba(18,18,18,.95);border:1px solid rgba(255,255,255,.3);
+  color:#FFF;padding:10px 18px;border-radius:20px;font-size:.65rem;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;text-align:center;
+  box-shadow:0 8px 25px rgba(0,0,0,.7);opacity:0;pointer-events:none;
+  transition:opacity .4s ease,transform .4s ease;z-index:200;
+  backdrop-filter:blur(8px);width:80%}
+.viewport-toast.active{opacity:1;transform:translateX(-50%) translateY(0)}
+.shimmer-slide-track{
+  position:relative;width:100%;height:42px;background:rgba(18,18,18,.9);
+  border:1px solid var(--border-color);border-radius:21px;margin-bottom:12px;
+  display:flex;align-items:center;padding:3px;box-sizing:border-box;
+  user-select:none;touch-action:none;cursor:pointer}
+.slide-thumb{
+  width:36px;height:36px;border-radius:50%;background:var(--silver-shimmer);
+  box-shadow:0 2px 10px rgba(255,255,255,.2);cursor:grab;
+  transition:transform .25s cubic-bezier(.25,1,.5,1);z-index:5}
+.slide-label{
+  position:absolute;width:100%;text-align:center;font-size:.6rem;font-weight:700;
+  letter-spacing:1.2px;color:var(--accent-silver);text-transform:uppercase;
+  pointer-events:none;display:flex;justify-content:center;align-items:center;gap:8px}
+.btn-toggle-small{
+  width:100%;background:rgba(255,255,255,.03);border:1px solid var(--border-color);
+  color:var(--accent-silver);padding:8px;border-radius:6px;font-size:.65rem;
+  font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  margin-bottom:10px;cursor:pointer;transition:all .25s ease}
+.panel{
+  background-color:var(--bg-surface);border:1px solid var(--border-color);
+  border-radius:8px;padding:14px;margin-bottom:14px;width:100%;box-sizing:border-box}
+.panel-title{
+  font-size:.72rem;font-weight:700;color:var(--text-muted);letter-spacing:1.5px;
+  text-transform:uppercase;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,.05);
+  padding-bottom:6px}
+.hud-btn{
+  font-family:'Montserrat',sans-serif;text-transform:uppercase;letter-spacing:2px;
+  border-radius:8px;cursor:pointer;text-align:center;transition:all .25s ease;font-weight:700}
+.btn-submit{width:100%;background-color:var(--text-main);color:var(--bg-primary);border:none;padding:14px;font-size:.85rem}
+.btn-preset{
+  background-color:var(--bg-primary);border:1px solid var(--border-color);
+  color:var(--text-main);padding:8px;border-radius:4px;font-size:.7rem}
+.btn-hunting{
+  width:100%;background-color:rgba(255,255,255,.02);color:#FFF;
+  border:1px solid rgba(255,255,255,.3);padding:14px;font-size:.85rem;margin-bottom:4px}
+.btn-hardware-master{width:100%;margin-bottom:12px;padding:14px;font-size:.85rem}
+.btn-shimmer-silver{
+  background:var(--silver-shimmer)!important;color:#0A0A0A!important;
+  border:none!important;box-shadow:0 4px 15px rgba(255,255,255,.1)}
+.btn-decline-thick{
+  width:100%;background-color:transparent!important;
+  border:2px solid var(--accent-red)!important;color:var(--accent-red)!important;
+  padding:12px;border-radius:8px;font-size:.75rem}
+/* Review overlay */
+.review-overlay{
+  display:none;position:fixed;top:0;left:0;right:0;bottom:0;
+  background-color:rgba(10,10,10,.98);z-index:100000!important;
+  padding:16px;overflow-y:auto;justify-content:center;
+  align-items:center;box-sizing:border-box}
+.review-container-scrollbox{
+  max-height:62vh;overflow-y:auto;padding-right:6px;
+  margin-bottom:16px;border-bottom:1px solid var(--border-color)}
+.review-image-container{
+  width:100%;aspect-ratio:4/3;background-color:#000;
+  border:1px solid var(--border-color);border-radius:8px;overflow:hidden;margin-bottom:16px}
+img#cachedImgView{width:100%;height:100%;object-fit:contain}
+/* Keyword suggestion chips */
+.keyword-chips{
+  display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;min-height:0}
+.kw-chip{
+  background:rgba(255,255,255,.05);border:1px solid var(--border-color);
+  color:var(--accent-silver);padding:4px 10px;border-radius:12px;
+  font-size:.58rem;font-weight:700;letter-spacing:1px;cursor:pointer;
+  transition:all .2s ease;text-transform:uppercase}
+.kw-chip:hover,.kw-chip.selected{
+  background:rgba(3,218,198,.15);border-color:var(--accent-green);
+  color:var(--accent-green)}
+/* Pitch affinity checkboxes */
+.affinity-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.affinity-btn{
+  background:rgba(255,255,255,.03);border:1px solid var(--border-color);
+  color:var(--text-muted);padding:7px 8px;border-radius:6px;font-size:.58rem;
+  font-weight:700;letter-spacing:.8px;cursor:pointer;text-transform:uppercase;
+  text-align:center;transition:all .2s ease}
+.affinity-btn.active{
+  background:rgba(206,206,206,.1);border-color:var(--accent-silver);
+  color:var(--text-main)}
+/* Duplicate overlay */
+.duplicate-overlay{
+  display:none;position:fixed;top:0;left:0;right:0;bottom:0;
+  background-color:rgba(10,10,10,.98);z-index:200000!important;
+  padding:16px;overflow-y:auto;box-sizing:border-box}
+.dup-record-compare{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.dup-col{
+  background:var(--bg-surface);border:1px solid var(--border-color);
+  border-radius:8px;padding:12px}
+.dup-col.new-data{border-color:var(--accent-green)}
+.dup-label{
+  font-size:.55rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:8px;color:var(--text-muted)}
+.dup-col.new-data .dup-label{color:var(--accent-green)}
+.dup-field{font-size:.72rem;color:var(--text-main);margin-bottom:4px;
+  word-break:break-word}
+.dup-field.changed{color:var(--accent-green);font-weight:700}
+.dup-match-badge{
+  background:rgba(207,102,121,.15);border:1px solid var(--accent-red);
+  color:var(--accent-red);padding:6px 12px;border-radius:6px;
+  font-size:.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  text-align:center;margin-bottom:14px}
+.dup-match-badge.job-change{
+  background:rgba(3,218,198,.1);border-color:var(--accent-green);
+  color:var(--accent-green)}
+/* Temp display badge */
+.temp-badge{
+  display:inline-block;background:rgba(255,255,255,.06);
+  border:1px solid var(--border-color);border-radius:6px;
+  padding:6px 14px;font-size:.72rem;font-weight:700;letter-spacing:1px;
+  color:var(--accent-silver)}
+</style>
+
+<div class="hud-body-container" id="terminalCanvas">
+  <div class="hud-header">
+    <span class="brand-title">ΛURΛLENS</span>
+    <span class="brand-subtitle">NNΛMDI MEDIΛ LΛBS // KERNEL v8.0</span>
+  </div>
+
+  <!-- AUTH -->
+  <div class="hud-wrapper" id="authInterfaceDeck">
+    <div class="auth-overlay-panel">
+      <div style="text-align:center;margin-bottom:12px">
+        <div style="font-size:.75rem;letter-spacing:.35em;color:var(--text-main);font-weight:700;text-transform:uppercase;margin-bottom:4px">AURALENS COGNITIVE INGESTION v8.0</div>
+        <div style="font-size:.5rem;letter-spacing:.2em;color:var(--text-muted);text-transform:uppercase">SECURED BY SUPABASE M-JWT</div>
+      </div>
+      <div class="input-group">
+        <label>NMC USER IDENTIFICATION</label>
+        <input type="email" id="authEmail" class="hud-in">
+      </div>
+      <div class="input-group">
+        <label>CRYPTOGRAPHIC SIGNATURE PASSPHRASE</label>
+        <input type="password" id="authPassword" class="hud-in">
+      </div>
+      <button id="authLoginSubmitBtn" class="btn-submit btn-shimmer-silver hud-btn" style="margin-top:10px">Authorize Terminal Interface</button>
+    </div>
+  </div>
+
+  <!-- OPERATIONAL DECK -->
+  <div class="hud-wrapper" id="coreTerminalDeck" style="display:none">
+    <button id="hardwareToggleMasterBtn" class="btn-hardware-master hud-btn btn-shimmer-silver">Activate Camera</button>
+
+    <div id="unleashedDeckGroup" style="display:none">
+
+      <!-- SESSION CONTEXT TRIGGER -->
+      <button id="toggleContextAnchorBtn" class="btn-toggle-small" style="display:flex;justify-content:space-between;align-items:center;text-align:left;padding:10px 12px;margin-bottom:12px">
+        <span id="contextSummaryText" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:82%">📍 ANCHOR: [NOT CONFIGURED]</span>
+        <span style="font-size:.58rem;color:var(--accent-green);font-weight:700;letter-spacing:1px">[ EDIT ]</span>
+      </button>
+
+      <!-- SESSION CONTEXT DRAWER -->
+      <div id="sessionContextDeck" class="panel" style="display:none;margin-bottom:12px;border-color:rgba(3,218,198,.4);background:rgba(18,18,18,.98)">
+        <div class="panel-title" style="color:var(--accent-green);border-bottom-color:rgba(3,218,198,.2);display:flex;justify-content:space-between">
+          <span>Session Context Anchor</span>
+          <span style="font-size:.55rem;color:var(--text-muted);font-weight:400">AUTO-CLOSES ON INACTIVITY</span>
+        </div>
+        <div class="input-group" style="margin-bottom:8px">
+          <label>Location / Event Anchor</label>
+          <input type="text" id="location_met" class="hud-in" placeholder="e.g. NYFW, First Financial Center">
+        </div>
+        <div class="input-group" style="margin-bottom:8px">
+          <label>Encounter Date</label>
+          <input type="date" id="encounter_date" class="hud-in">
+        </div>
+        <div class="input-group" style="margin-bottom:0">
+          <label>Custom Keywords & Hashtags</label>
+          <input type="text" id="custom_keywords" class="hud-in" placeholder="#NYFW2026, #BrandCampaign">
+          <div class="keyword-chips" id="keywordChipContainer"></div>
+        </div>
+      </div>
+
+      <!-- VIEWFINDER -->
+      <div class="viewfinder-wrapper" id="viewfinderFrame">
+        <video id="webcam" autoplay playsinline muted></video>
+        <div id="emeraldBeacon" class="emerald-beacon"></div>
+        <div id="viewportToast" class="viewport-toast"></div>
+        <div class="scanner-overlay">
+          <div class="target-box" id="targetBox"></div>
+        </div>
+        <div class="countdown-indicator" id="countdownLabel">Locking Telemetry Vector...</div>
+      </div>
+
+      <!-- MODE TRACK -->
+      <div class="shimmer-slide-track" id="modeSlideTrack">
+        <div class="slide-label" id="slideTrackLabel">
+          <span id="modeLabelText">MODE: MATRIX</span>
+          <span style="opacity:.3">|</span>
+          <span id="dualLabelText" style="color:var(--accent-silver)">🎴 DUAL: OFF</span>
+        </div>
+        <div class="slide-thumb" id="slideThumb"></div>
+      </div>
+
+      <button id="huntingControlBtn" class="btn-hunting hud-btn">Engage Scan Mode</button>
+      <button id="authLogoutBtn" class="btn-preset hud-btn" style="width:100%;border-color:var(--accent-red);color:var(--accent-red);margin-top:15px;padding:10px;border-radius:8px">Terminate Session</button>
+
+      <div id="sessionLogDeck" class="panel" style="margin-top:20px;border-color:rgba(255,255,255,.1)">
+        <div class="panel-title" style="color:var(--accent-silver)">Confirmed Session Snapshot</div>
+        <div id="sessionLogContainer" style="display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto">
+          <div style="font-size:.65rem;color:var(--text-muted);text-align:center;padding:12px">No entries committed in active session</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DUPLICATE VERIFICATION OVERLAY -->
+<div class="duplicate-overlay" id="duplicateOverlay">
+  <div class="hud-wrapper" style="margin-top:auto;margin-bottom:auto;max-width:460px">
+    <div style="text-align:center;margin-bottom:14px;color:#FFF;font-size:.8rem;letter-spacing:2.5px;text-transform:uppercase;font-weight:700">Existing Record Detected</div>
+    <div class="dup-match-badge" id="dupMatchBadge">EMAIL MATCH</div>
+    <div class="dup-record-compare">
+      <div class="dup-col">
+        <div class="dup-label">Existing Record</div>
+        <div id="dupExistingFields"></div>
+      </div>
+      <div class="dup-col new-data">
+        <div class="dup-label">New Scan Data</div>
+        <div id="dupNewFields"></div>
+      </div>
+    </div>
+    <button id="dupUpdateBtn" class="btn-submit btn-shimmer-silver hud-btn" style="margin-bottom:10px;padding:14px">Update Record</button>
+    <button id="dupNewContactBtn" class="hud-btn" style="width:100%;background:transparent;border:1px solid var(--border-color);color:var(--accent-silver);padding:12px;font-size:.75rem;margin-bottom:10px">Not the Same Person — Create New</button>
+    <button id="dupDiscardBtn" class="btn-decline-thick hud-btn">Discard Scan</button>
+  </div>
+</div>
+
+<!-- EXTRACTION REVIEW OVERLAY -->
+<div class="review-overlay" id="reviewOverlay">
+  <div class="hud-wrapper" style="margin-top:auto;margin-bottom:auto">
+    <div style="text-align:center;margin-bottom:14px;color:#FFF;font-size:.8rem;letter-spacing:2.5px;text-transform:uppercase;font-weight:700">Extraction Review Matrix</div>
+
+    <div class="review-container-scrollbox" id="reviewContainerScrollbox">
+      <div class="review-image-container"><img id="cachedImgView" src=""></div>
+
+      <!-- PANEL 1: BRANCH -->
+      <div class="panel">
+        <div class="panel-title">1. Target Branch Ecosystem</div>
+        <div class="input-group" style="margin-bottom:0">
+          <label>Target Corporate Ecosystem</label>
+          <select id="ecosystem_target" class="hud-in">
+            <option value="NMC">Branch B: NMC Residency (Strategy / IP)</option>
+            <option value="NFINITY">Branch A: Nfinity Studios (Ops / Infra)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- PANEL 2: AI EXTRACTED FIELDS -->
+      <div class="panel">
+        <div class="panel-title">2. Canonical Extracted Entity Profile</div>
+        <div id="dynamicAIFieldsContainer"></div>
+      </div>
+
+      <!-- PANEL 3: CRM CLASSIFICATION -->
+      <div class="panel" style="border-color:rgba(206,206,206,.2)">
+        <div class="panel-title" style="color:var(--accent-silver)">3. CRM Classification</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+          <div class="input-group" style="margin-bottom:0">
+            <label>Contact Tier (1=Top)</label>
+            <select id="crm_tier" class="hud-in">
+              <option value="1">Tier 1 — Primary Target</option>
+              <option value="2">Tier 2 — High Value</option>
+              <option value="3">Tier 3 — Maintenance</option>
+              <option value="4" selected>Tier 4 — Unqualified</option>
+            </select>
+          </div>
+          <div class="input-group" style="margin-bottom:0">
+            <label>Relationship Status</label>
+            <select id="crm_relationship_status" class="hud-in">
+              <option value="active" selected>Active</option>
+              <option value="nurture">Nurture</option>
+              <option value="paused">Paused</option>
+            </select>
+            <div style="font-size:.55rem;color:var(--text-muted);margin-top:5px;line-height:1.8">
+              <b style="color:var(--accent-silver)">T1</b> Masthead editors, luxury CMOs, HNWI, politicians &nbsp;·&nbsp;
+              <b style="color:var(--accent-silver)">T2</b> Brand managers, regional press, established creatives &nbsp;·&nbsp;
+              <b style="color:var(--accent-silver)">T3</b> Collaborators, referral sources, peers &nbsp;·&nbsp;
+              <b style="color:var(--accent-silver)">T4</b> Unqualified / pending research
+            </div>
+          </div>
+        </div>
+
+        <div class="input-group" style="margin-bottom:10px">
+          <label>Pitch Affinity</label>
+          <div class="affinity-grid">
+            <button type="button" class="affinity-btn" data-affinity="editorial">Editorial</button>
+            <button type="button" class="affinity-btn" data-affinity="brand_campaign">Brand Campaign</button>
+            <button type="button" class="affinity-btn" data-affinity="personal_marketing">Personal Marketing</button>
+            <button type="button" class="affinity-btn" data-affinity="studio_rental">Studio Rental</button>
+            <button type="button" class="affinity-btn" data-affinity="corporate_retainer">Corp Retainer</button>
+          </div>
+        </div>
+
+        <div class="input-group" style="margin-bottom:0">
+          <label>Preferred Comm Channel</label>
+          <select id="crm_preferred_comm" class="hud-in">
+            <option value="">— Unknown —</option>
+            <option value="email">Email</option>
+            <option value="phone">Phone</option>
+            <option value="text">Text / SMS</option>
+            <option value="whatsapp">WhatsApp</option>
+            <option value="video">Video Call</option>
+            <option value="in_person">In Person</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- PANEL 4: STRATEGIC NOTES -->
+      <div class="panel" style="border-color:rgba(3,218,198,.3)">
+        <div class="panel-title" style="color:var(--accent-green)">4. Actionable Strategic Notes</div>
+        <div class="input-group">
+          <label>Networking Notes</label>
+          <textarea id="connection_rationale" class="hud-in"></textarea>
+        </div>
+        <div class="input-group">
+          <label>Next Actionable Step</label>
+          <textarea id="next_action" class="hud-in"></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="input-group" style="margin-bottom:0">
+            <label>Follow-Up Date</label>
+            <input type="date" id="follow_up_at" class="hud-in">
+          </div>
+          <div class="input-group" style="margin-bottom:0">
+            <label>Keywords</label>
+            <input type="text" id="review_keywords" class="hud-in" placeholder="#Tag1, #Tag2">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button id="confirmCommitBtn" class="btn-submit btn-shimmer-silver hud-btn" style="margin-bottom:10px;padding:14px">Confirm & Commit Row</button>
+    <button id="discardAbortBtn" class="btn-decline-thick hud-btn">Discard Cache</button>
+  </div>
+</div>
+
+<canvas id="analyzerCanvas" style="display:none"></canvas>
+<canvas id="preprocessCanvas" style="display:none"></canvas>
+
+<script>
+// ============================================================
+// ΛURΛLENS KERNEL v8.0
+// ============================================================
+
+const SUPABASE_PROJECT_URL = "https://vpqglsjocmqrsgsmetip.supabase.co";
+const SUPABASE_PUBLIC_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwcWdsc2pvY21xcnNnc21ldGlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNDkyNTMsImV4cCI6MjA5NzgyNTI1M30.zPnr72oc9aOsfomeFY7M8KqBSy68onvhfBxhBtrzwZs";
+const CLOUD_FUNCTION_URL = `${SUPABASE_PROJECT_URL}/functions/v1/auralens-processor`;
+
+const STORAGE_KEY_LOC = "auralens_ctx_loc_v8";
+const STORAGE_KEY_KEY = "auralens_ctx_key_v8";
+const STORAGE_KEY_ENC = "auralens_ctx_enc_v8";
+const STORAGE_KEY_TS  = "auralens_ctx_ts_v8";
+const ONE_HOUR_MS     = 3_600_000;
+
+const CANONICAL_SCHEMA = [
+  { key:'name',      label:'FULL NAME' },
+  { key:'title',     label:'JOB TITLE' },
+  { key:'company',   label:'COMPANY / ENTITY' },
+  { key:'email',     label:'EMAIL ADDRESS' },
+  { key:'phone',     label:'PHONE NUMBER' },
+  { key:'website',   label:'WEBSITE URL' },
+  { key:'address',   label:'PHYSICAL ADDRESS' },
+  { key:'instagram', label:'INSTAGRAM HANDLE' },
+  { key:'linkedin',  label:'LINKEDIN PROFILE' },
+];
+
+// ── State ──────────────────────────────────────────────────
+let sbClient = null, activeSession = null;
+let cameraActive = false, currentStreamRef = null;
+let ephemeralImageCache = null, frontImageBuffer = null;
+let analysisLoopActive = false, lastFramePixels = null;
+let goodFrameBuffer = [], scanTimeoutTimer = null;
+let burstModeActive = false, twoSidedModeActive = false;
+let contextDrawerTimer = null, lastDebounceTs = 0;
+let domCache = {};
+let keywordCache = [];
+let pendingDuplicates = [], pendingProfile = null, pendingMergeId = null;
+
+// ── Utilities ──────────────────────────────────────────────
+function fmt(str) {
+  if (!str || typeof str !== 'string') return str;
+  if (str.includes('@')) return str.toLowerCase().trim();
+  return str.toLowerCase().split(' ').map(w => {
+    if (!w) return '';
+    if (['nyc','oh','llc','inc','f500','cincy','nmc'].includes(w)) return w.toUpperCase();
+    return w.charAt(0).toUpperCase() + w.slice(1);
+  }).join(' ');
+}
+
+function getDefaultFollowUpDate() {
+  const d = new Date(); d.setDate(d.getDate() + 3);
+  return d.toISOString().split('T')[0];
+}
+
+function todayISO() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+  
+function normalizeKeywords(raw) {
+  if (!raw || !raw.trim()) return [];
+  const tags = raw.split(/[,\s]+/).filter(Boolean).map(t => {
+    t = t.replace(/\s+/g,'');
+    if (!t.startsWith('#')) t = '#' + t;
+    return '#' + t.slice(1).charAt(0).toUpperCase() + t.slice(2);
+  });
+  const loc = (domCache.locationMet?.value || '').trim().replace(/\s+/g,'').slice(0,18);
+  if (loc) {
+    const locTag = '#' + loc.charAt(0).toUpperCase() + loc.slice(1);
+    if (!tags.includes(locTag)) tags.unshift(locTag);
+  }
+  return [...new Set(tags)];
+}
+
+function getSelectedAffinities() {
+  return [...document.querySelectorAll('.affinity-btn.active')].map(b => b.dataset.affinity);
+}
+
+function forceOverlayScrollReset() {
+  if (domCache.reviewOverlay)   domCache.reviewOverlay.scrollTop   = 0;
+  if (domCache.reviewScrollbox) domCache.reviewScrollbox.scrollTop = 0;
+}
+
+// ── Canvas Pre-processing ──────────────────────────────────
+function preprocessForOCR(srcCanvas) {
+  const w = srcCanvas.width, h = srcCanvas.height;
+  const out = document.getElementById('preprocessCanvas');
+  out.width = w; out.height = h;
+  const ctx = out.getContext('2d');
+  ctx.drawImage(srcCanvas, 0, 0);
+
+  const imgData = ctx.getImageData(0, 0, w, h);
+  const d = imgData.data;
+  let minL = 255, maxL = 0, sumL = 0;
+  const lum = new Uint8Array(w * h);
+
+  for (let i = 0, j = 0; i < d.length; i += 4, j++) {
+    const L = Math.round(0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2]);
+    lum[j] = L;
+    if (L < minL) minL = L;
+    if (L > maxL) maxL = L;
+    sumL += L;
+  }
+
+  const meanL   = sumL / (w * h);
+  const isDark  = meanL < 128;
+  const range   = (maxL - minL) || 1;
+
+  for (let i = 0, j = 0; i < d.length; i += 4, j++) {
+    let v = Math.round((lum[j] - minL) * 255 / range);
+    if (isDark) v = 255 - v;
+    d[i] = d[i+1] = d[i+2] = v; d[i+3] = 255;
+  }
+  ctx.putImageData(imgData, 0, 0);
+  return out;
+}
+
+function rotateCanvas90(src) {
+  const out = document.createElement('canvas');
+  out.width = src.height; out.height = src.width;
+  const ctx = out.getContext('2d');
+  ctx.translate(out.width/2, out.height/2);
+  ctx.rotate(Math.PI/2);
+  ctx.drawImage(src, -src.width/2, -src.height/2);
+  return out;
+}
+
+async function initTesseractWorker() {
+  try {
+    if (window.tesseractWorker) {
+      try { await window.tesseractWorker.terminate(); } catch {}
+    }
+    window.tesseractWorker = await Tesseract.createWorker('eng');
+    console.log('[TESSERACT] Worker ready');
+  } catch(e) {
+    window.tesseractWorker = null;
+    console.warn('[TESSERACT] Worker init failed:', e.message);
+  }
+}
+  
+// ── Tesseract OCR ──────────────────────────────────────────
+async function runTesseract(canvas) {
+  if (!window.tesseractWorker) await initTesseractWorker();
+  const preprocessed = preprocessForOCR(canvas);
+  try {
+    let data;
+    if (window.tesseractWorker) {
+      const result = await window.tesseractWorker.recognize(preprocessed);
+      data = result.data;
+    } else {
+      const result = await Tesseract.recognize(preprocessed, 'eng', { logger:()=>{} });
+      data = result.data;
+    }
+    const avgConf = data.words?.length
+      ? data.words.reduce((s,w) => s+w.confidence, 0) / data.words.length : 0;
+
+    // Skip rotation if confidence is reasonable — saves 2-5s
+    if (avgConf >= 40) {
+      return { text: data.text.trim(), confidence: avgConf, rotated: false };
+    }
+
+    // Low confidence only: try 90° rotation
+    const rotatedCanvas = rotateCanvas90(preprocessed);
+    let data2;
+    if (window.tesseractWorker) {
+      const result2 = await window.tesseractWorker.recognize(rotatedCanvas);
+      data2 = result2.data;
+    } else {
+      const result2 = await Tesseract.recognize(rotatedCanvas, 'eng', { logger:()=>{} });
+      data2 = result2.data;
+    }
+    const avgConf2 = data2.words?.length
+      ? data2.words.reduce((s,w) => s+w.confidence, 0) / data2.words.length : 0;
+
+    if (avgConf2 > avgConf) {
+      return { text: data2.text.trim(), confidence: avgConf2, rotated: true };
+    }
+    return { text: data.text.trim(), confidence: avgConf, rotated: false };
+
+  } catch(e) {
+    console.warn('[TESSERACT] Recognize failed, resetting worker:', e.message);
+    window.tesseractWorker = null;
+    return { text: '', confidence: 0, rotated: false };
+  }
+}
+  
+// ── Keyword Cache ──────────────────────────────────────────
+async function loadKeywordCache() {
+  try {
+    const { data } = await sbClient
+      .from('platform_contacts')
+      .select('custom_keywords')
+      .neq('email','system_heartbeat@nmc.internal');
+    const all = new Set();
+    (data||[]).forEach(r => {
+      let tags = r.custom_keywords;
+      if (typeof tags === 'string') { try { tags = JSON.parse(tags); } catch { tags = []; } }
+      if (Array.isArray(tags)) tags.forEach(t => all.add(t));
+    });
+    keywordCache = [...all].filter(Boolean).sort();
+    renderKeywordChips();
+  } catch(e) { console.warn('[KEYWORDS] Cache load failed:', e.message); }
+}
+
+function renderKeywordChips() {
+  const c = document.getElementById('keywordChipContainer');
+  if (!c || !keywordCache.length) return;
+  c.innerHTML = '';
+  keywordCache.slice(0,20).forEach(tag => {
+    const chip = document.createElement('span');
+    chip.className = 'kw-chip';
+    chip.textContent = tag;
+    chip.onclick = () => {
+      const inp = domCache.customKeywords;
+      const cur = inp.value.trim();
+      inp.value = cur ? `${cur}, ${tag}` : tag;
+      chip.classList.toggle('selected');
+    };
+    c.appendChild(chip);
+  });
+}
+
+// ── Duplicate Detection ────────────────────────────────────
+async function checkDuplicates(email, name) {
+  if (!email && !name) return [];
+  try {
+    const { data, error } = await sbClient.rpc('find_similar_contacts', {
+      p_name:  name  || '',
+      p_email: email || ''
+    });
+    if (error) throw error;
+    return data || [];
+  } catch (e) {
+    console.warn('[DUPLICATE CHECK]', e.message);
+    return [];
+  }
+}
+
+function showDuplicateOverlay(existing, newProfile) {
+  pendingDuplicates = existing;
+  pendingProfile    = newProfile;
+  const top = existing[0];
+  pendingMergeId    = top.id;
+
+  const badge = document.getElementById('dupMatchBadge');
+  const isJobChange = top.match_type !== 'email_exact'
+    || (top.company_node && newProfile.company
+        && top.company_node.toLowerCase() !== newProfile.company.toLowerCase());
+  badge.textContent  = isJobChange ? '⚡ JOB CHANGE DETECTED' : 'EXISTING RECORD — ' + top.match_type.replace('_',' ').toUpperCase();
+  badge.className    = `dup-match-badge${isJobChange ? ' job-change' : ''}`;
+
+  const compareFields = ['full_name','job_title','company_node','email','phone'];
+  const newMap = {
+    full_name:    newProfile.name,
+    job_title:    newProfile.title,
+    company_node: newProfile.company,
+    email:        newProfile.email,
+    phone:        newProfile.phone
+  };
+
+  document.getElementById('dupExistingFields').innerHTML = compareFields.map(f => {
+    const v = top[f] || '—';
+    const changed = newMap[f] && newMap[f].toLowerCase() !== (v||'').toLowerCase();
+    return `<div class="dup-field${changed ? ' changed':''}">${v}</div>`;
+  }).join('');
+
+  document.getElementById('dupNewFields').innerHTML = compareFields.map(f => {
+    const v = newMap[f] || '—';
+    const changed = top[f] && (top[f]||'').toLowerCase() !== (v||'').toLowerCase();
+    return `<div class="dup-field${changed ? ' changed':''}">${v}</div>`;
+  }).join('');
+
+  document.getElementById('duplicateOverlay').style.display = 'block';
+}
+
+async function executeMergeCommit() {
+  if (!pendingMergeId || !pendingProfile) return;
+  document.getElementById('duplicateOverlay').style.display = 'none';
+
+  // Fetch existing notes_thread to append
+  const { data: existing } = await sbClient
+    .from('platform_contacts')
+    .select('notes_thread, company_node, job_title, current_temp')
+    .eq('id', pendingMergeId)
+    .single();
+
+  let thread = [];
+  try { thread = JSON.parse(existing?.notes_thread || '[]'); } catch { thread = []; }
+  if (!Array.isArray(thread)) thread = [];
+
+  const oldCompany = existing?.company_node || '';
+  const newCompany = pendingProfile.company  || '';
+  const isJobChange = newCompany && oldCompany.toLowerCase() !== newCompany.toLowerCase();
+
+  thread.push(isJobChange ? {
+    type: 'job_change',
+    previous_title:   existing?.job_title || '',
+    previous_company: oldCompany,
+    new_title:        pendingProfile.title   || '',
+    new_company:      newCompany,
+    author:           'AURALENS_MERGE',
+    timestamp:        new Date().toISOString()
+  } : {
+    type:      're_scan',
+    note:      `Re-scanned at ${domCache.locationMet?.value || 'unknown location'}. No job change detected.`,
+    author:    'AURALENS_MERGE',
+    timestamp: new Date().toISOString()
+  });
+
+  const mergePayload = {
+    full_name:    fmt(pendingProfile.name    || ''),
+    job_title:    fmt(pendingProfile.title   || ''),
+    company_node: fmt(pendingProfile.company || ''),
+    email:        (pendingProfile.email || '').toLowerCase().trim(),
+    phone:        pendingProfile.phone   || null,
+    website:      pendingProfile.website || null,
+    address:      pendingProfile.address || null,
+    instagram_handle: pendingProfile.instagram || null,
+    linkedin_url: pendingProfile.linkedin  || null,
+    encounter_date: domCache.encounterDate?.value || todayISO(),
+    notes_thread: JSON.stringify(thread),
+    updated_at:   new Date().toISOString()
+  };
+
+  const { error } = await sbClient
+    .from('platform_contacts')
+    .update(mergePayload)
+    .eq('id', pendingMergeId);
+
+  if (error) { showViewportToast(`MERGE FAULT: ${error.message}`); return; }
+
+  showViewportToast(`MERGED: ${(pendingProfile.name||'').toUpperCase()}`);
+  appendSessionLogCard(pendingProfile);
+  resetSystemToScanMode();
+}
+
+// ── Core Init ──────────────────────────────────────────────
+function initializeSecureAuraLens() {
+  sbClient = supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_PUBLIC_ANON_KEY);
+  sbClient.auth.onAuthStateChange((_event, session) => { activeSession = session; });
+
+  domCache = {
+    authEmail:           document.getElementById('authEmail'),
+    authPassword:        document.getElementById('authPassword'),
+    authDeck:            document.getElementById('authInterfaceDeck'),
+    coreDeck:            document.getElementById('coreTerminalDeck'),
+    webcam:              document.getElementById('webcam'),
+    viewframe:           document.getElementById('viewfinderFrame'),
+    countdownLabel:      document.getElementById('countdownLabel'),
+    huntingControlBtn:   document.getElementById('huntingControlBtn'),
+    hardwareToggleMasterBtn: document.getElementById('hardwareToggleMasterBtn'),
+    locationMet:         document.getElementById('location_met'),
+    encounterDate:       document.getElementById('encounter_date'),
+    customKeywords:      document.getElementById('custom_keywords'),
+    ecosystemTarget:     document.getElementById('ecosystem_target'),
+    connectionRationale: document.getElementById('connection_rationale'),
+    nextAction:          document.getElementById('next_action'),
+    followUpAt:          document.getElementById('follow_up_at'),
+    reviewOverlay:       document.getElementById('reviewOverlay'),
+    reviewScrollbox:     document.getElementById('reviewContainerScrollbox'),
+    cachedImgView:       document.getElementById('cachedImgView'),
+    dynamicAIFields:     document.getElementById('dynamicAIFieldsContainer'),
+    sessionContextDeck:  document.getElementById('sessionContextDeck'),
+    contextSummaryText:  document.getElementById('contextSummaryText')
+  };
+
+  document.getElementById('authLoginSubmitBtn').onclick = executeIdentityVerification;
+  document.getElementById('authLogoutBtn').onclick      = terminateSecureSession;
+  domCache.hardwareToggleMasterBtn.onclick = handleHardwareMasterToggle;
+  domCache.huntingControlBtn.onclick       = toggleHuntingEngine;
+  document.getElementById('confirmCommitBtn').onclick   = executeVerifiedCommit;
+  document.getElementById('discardAbortBtn').onclick    = resetSystemToScanMode;
+  document.getElementById('dupUpdateBtn').onclick       = executeMergeCommit;
+  document.getElementById('dupNewContactBtn').onclick   = () => {
+    document.getElementById('duplicateOverlay').style.display = 'none';
+    openReviewOverlay(pendingProfile);
+  };
+  document.getElementById('dupDiscardBtn').onclick = () => {
+    document.getElementById('duplicateOverlay').style.display = 'none';
+    resetSystemToScanMode();
+  };
+
+  // Affinity buttons
+  document.querySelectorAll('.affinity-btn').forEach(btn => {
+    btn.onclick = () => btn.classList.toggle('active');
+  });
+
+  initShimmerSlideTrack();
+  initSessionContextController();
+
+  domCache.viewframe.onclick = () => {
+    if (cameraActive && analysisLoopActive) finalizeBestFrameAndCapture();
+  };
+
+  sbClient.auth.getSession().then(({ data: { session } }) => {
+    handleSessionTransition(session);
+  });
+}
+
+window.addEventListener('DOMContentLoaded', initializeSecureAuraLens);
+
+// ── Slide Track ────────────────────────────────────────────
+function initShimmerSlideTrack() {
+  const track = document.getElementById('modeSlideTrack');
+  const thumb = document.getElementById('slideThumb');
+  let startX = 0, startY = 0;
+  track.addEventListener('pointerdown', e => { startX = e.clientX; startY = e.clientY; });
+  track.addEventListener('pointerup',   e => {
+    const dx = Math.abs(e.clientX-startX), dy = Math.abs(e.clientY-startY);
+    if (dx < 12 && dy < 12) {
+      twoSidedModeActive = !twoSidedModeActive;
+      frontImageBuffer = null;
+      showViewportToast(twoSidedModeActive ? "DUAL SCAN ACTIVE: SCAN FRONT FIRST" : "SINGLE-SIDED MODE");
+      updateTrackUI(); return;
+    }
+    if (dx >= 12) { burstModeActive = !burstModeActive; updateTrackUI(); }
+  });
+  thumb.onclick = e => { e.stopPropagation(); burstModeActive = !burstModeActive; updateTrackUI(); };
+}
+
+function updateTrackUI() {
+  const track = document.getElementById('modeSlideTrack');
+  const thumb = document.getElementById('slideThumb');
+  const modeLabel = document.getElementById('modeLabelText');
+  const dualLabel = document.getElementById('dualLabelText');
+  thumb.style.transform = burstModeActive
+    ? `translateX(${track.offsetWidth - thumb.offsetWidth - 6}px)` : 'translateX(0)';
+  modeLabel.innerText = burstModeActive ? "MODE: BURST"   : "MODE: MATRIX";
+  modeLabel.style.color = burstModeActive ? "var(--accent-green)" : "var(--accent-silver)";
+  dualLabel.innerText   = twoSidedModeActive ? "🎴 DUAL: ACTIVE" : "🎴 DUAL: OFF";
+  dualLabel.style.color = twoSidedModeActive ? "var(--accent-green)" : "var(--accent-silver)";
+}
+
+// ── Session Context ────────────────────────────────────────
+function initSessionContextController() {
+  const saved = parseInt(localStorage.getItem(STORAGE_KEY_TS)||'0');
+  if (saved && (Date.now()-saved < ONE_HOUR_MS)) {
+    domCache.locationMet.value  = localStorage.getItem(STORAGE_KEY_LOC) || '';
+    domCache.customKeywords.value = localStorage.getItem(STORAGE_KEY_KEY) || '';
+    domCache.encounterDate.value  = localStorage.getItem(STORAGE_KEY_ENC) || todayISO();
+  } else {
+    domCache.encounterDate.value = todayISO();
+  }
+  updateContextSummary();
+
+  const save = () => {
+    localStorage.setItem(STORAGE_KEY_LOC, domCache.locationMet.value);
+    localStorage.setItem(STORAGE_KEY_KEY, domCache.customKeywords.value);
+    localStorage.setItem(STORAGE_KEY_ENC, domCache.encounterDate.value);
+    localStorage.setItem(STORAGE_KEY_TS,  Date.now().toString());
+    updateContextSummary();
+    throttledResetContextTimer();
+  };
+  domCache.locationMet.addEventListener('input', save);
+  domCache.customKeywords.addEventListener('input', save);
+  domCache.encounterDate.addEventListener('input', save);
+
+  document.getElementById('toggleContextAnchorBtn').onclick = () => {
+    const deck = domCache.sessionContextDeck;
+    deck.style.display = (!deck.style.display || deck.style.display==='none') ? 'block' : 'none';
+    if (deck.style.display === 'block') { domCache.locationMet.focus(); resetContextTimer(); }
+  };
+  domCache.sessionContextDeck.addEventListener('focusout', () => {
+    setTimeout(() => {
+      if (!domCache.sessionContextDeck.contains(document.activeElement)) closeContextDrawer();
+    }, 60);
+  });
+}
+
+function updateContextSummary() {
+  const loc = domCache.locationMet?.value?.trim() || '';
+  const enc = domCache.encounterDate?.value || '';
+  if (!loc && !enc) {
+    domCache.contextSummaryText.innerText = '📍 ANCHOR: [NOT SET — TAP TO EDIT]';
+    domCache.contextSummaryText.style.color = 'var(--accent-silver)';
+  } else {
+    domCache.contextSummaryText.innerText = `📍 ${loc||'NO LOCATION'} | ${enc||'NO DATE'}`;
+    domCache.contextSummaryText.style.color = '#FFF';
+  }
+}
+
+function closeContextDrawer() {
+  domCache.sessionContextDeck.style.display = 'none';
+  if (contextDrawerTimer) { clearTimeout(contextDrawerTimer); contextDrawerTimer = null; }
+}
+function resetContextTimer() {
+  if (contextDrawerTimer) clearTimeout(contextDrawerTimer);
+  contextDrawerTimer = setTimeout(closeContextDrawer, 5000);
+}
+function throttledResetContextTimer() {
+  const now = Date.now();
+  if (now - lastDebounceTs > 250) { lastDebounceTs = now; resetContextTimer(); }
+}
+
+// ── Auth ───────────────────────────────────────────────────
+async function executeIdentityVerification() {
+  const email = domCache.authEmail.value.trim();
+  const pass  = domCache.authPassword.value.trim();
+  const { data, error } = await sbClient.auth.signInWithPassword({ email, password: pass });
+  if (error) { alert(`Identity Check Denied: ${error.message}`); return; }
+  handleSessionTransition(data.session);
+}
+
+function handleSessionTransition(session) {
+  activeSession = session;
+  if (session) {
+    domCache.authDeck.style.display = 'none';
+    domCache.coreDeck.style.display = 'block';
+    loadKeywordCache();
+    initTesseractWorker();
+  } else {
+    domCache.authDeck.style.display = 'block';
+    domCache.coreDeck.style.display = 'none';
+    killHardwareLens();
+  }
+}
+
+async function terminateSecureSession() {
+  await sbClient.auth.signOut();
+  handleSessionTransition(null);
+}
+
+// ── Camera ─────────────────────────────────────────────────
+async function handleHardwareMasterToggle() {
+  const deck = document.getElementById('unleashedDeckGroup');
+  if (!cameraActive) {
+    if (await initializeHardwareLens()) {
+      cameraActive = true;
+      deck.style.display = 'block';
+      domCache.hardwareToggleMasterBtn.innerText = 'Deactivate Camera';
+      domCache.hardwareToggleMasterBtn.className = 'btn-hardware-master hud-btn btn-hunting';
+    }
+  } else { killHardwareLens(); deck.style.display = 'none'; }
+}
+
+async function initializeHardwareLens() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: 1280, height: 720 }, audio: false
+    });
+    domCache.webcam.srcObject = stream; currentStreamRef = stream; return true;
+  } catch { alert('Lens Blocked: Verify device authorization.'); return false; }
+}
+
+function killHardwareLens() {
+  if (currentStreamRef) currentStreamRef.getTracks().forEach(t=>t.stop());
+  domCache.webcam.srcObject = null; cameraActive = false; analysisLoopActive = false;
+  clearTimeout(scanTimeoutTimer);
+  domCache.viewframe.className = 'viewfinder-wrapper';
+  domCache.hardwareToggleMasterBtn.innerText = 'Activate Camera';
+  domCache.hardwareToggleMasterBtn.className = 'btn-hardware-master hud-btn btn-shimmer-silver';
+  domCache.huntingControlBtn.className = 'btn-hunting hud-btn';
+  domCache.huntingControlBtn.innerText = 'Engage Scan Mode';
+}
+
+function toggleHuntingEngine() {
+  if (!cameraActive) { alert('Activate Camera first.'); return; }
+  analysisLoopActive = !analysisLoopActive;
+  domCache.viewframe.className = analysisLoopActive
+    ? 'viewfinder-wrapper hunting-active' : 'viewfinder-wrapper';
+  domCache.huntingControlBtn.className = analysisLoopActive
+    ? 'btn-hunting hud-btn btn-shimmer-silver' : 'btn-hunting hud-btn';
+  domCache.huntingControlBtn.innerText = analysisLoopActive ? 'Pause Scanning' : 'Engage Scan Mode';
+  if (analysisLoopActive) {
+    goodFrameBuffer = []; lastFramePixels = null;
+    executeAnalysisLoop();
+    clearTimeout(scanTimeoutTimer);
+    scanTimeoutTimer = setTimeout(() => { if (analysisLoopActive) finalizeBestFrameAndCapture(); }, 1500);
+  } else { clearTimeout(scanTimeoutTimer); }
+}
+
+function executeAnalysisLoop() {
+  if (!analysisLoopActive) return;
+  const actx = document.getElementById('analyzerCanvas').getContext('2d',{willReadFrequently:true});
+  actx.drawImage(domCache.webcam, 0, 0, 40, 30);
+  const frameData = actx.getImageData(0,0,40,30).data;
+  if (lastFramePixels) {
+    let delta = 0;
+    for (let i = 0; i < frameData.length; i+=4) delta += Math.abs(frameData[i]-lastFramePixels[i]);
+    const variance = delta / 1200;
+    if (variance < 32) {
+      const rc = document.createElement('canvas');
+      const rctx = rc.getContext('2d');
+      const tw = Math.min(domCache.webcam.videoWidth||1280, 800);
+      const scale = tw / (domCache.webcam.videoWidth||1280);
+      rc.width = tw; rc.height = (domCache.webcam.videoHeight||720)*scale;
+      rctx.drawImage(domCache.webcam, 0, 0, rc.width, rc.height);
+      goodFrameBuffer.push({ canvas: rc, imageUri: rc.toDataURL('image/jpeg',0.68), score: variance });
+      domCache.viewframe.className = 'viewfinder-wrapper tracking hunting-active';
+      domCache.countdownLabel.innerText = `ACCUMULATING SAMPLES (${goodFrameBuffer.length}/6)`;
+      if (goodFrameBuffer.length >= 2) { finalizeBestFrameAndCapture(); return; }
+    }
+  }
+  lastFramePixels = frameData;
+  setTimeout(executeAnalysisLoop, 70);
+}
+
+function finalizeBestFrameAndCapture() {
+  clearTimeout(scanTimeoutTimer);
+  analysisLoopActive = false;
+
+  let capturedCanvas, capturedUri;
+  if (goodFrameBuffer.length === 0) {
+    const rc = document.createElement('canvas'); rc.width = 800; rc.height = 450;
+    rc.getContext('2d').drawImage(domCache.webcam, 0, 0, 800, 450);
+    capturedCanvas = rc; capturedUri = rc.toDataURL('image/jpeg',0.68);
+  } else {
+    goodFrameBuffer.sort((a,b)=>a.score-b.score);
+    capturedCanvas = goodFrameBuffer[0].canvas;
+    capturedUri    = goodFrameBuffer[0].imageUri;
+  }
+
+  if (twoSidedModeActive && !frontImageBuffer) {
+    frontImageBuffer = capturedUri;
+    showViewportToast("FRONT CAPTURED — SCAN BACK OF CARD");
+    domCache.viewframe.className = 'viewfinder-wrapper';
+    domCache.huntingControlBtn.className = 'btn-hunting hud-btn';
+    domCache.huntingControlBtn.innerText = 'Engage Scan Mode (Back)';
+    return;
+  }
+
+  domCache.viewframe.className = 'viewfinder-wrapper locked';
+  executeAutoShutterCapture(capturedCanvas, capturedUri);
+}
+
+// ── Main Capture Pipeline ──────────────────────────────────
+async function executeAutoShutterCapture(capturedCanvas, backImageUri) {
+  domCache.countdownLabel.innerText = 'RUNNING LOCAL OCR...';
+
+  // Step 1: Try Tesseract
+  const { text, confidence, rotated } = await runTesseract(capturedCanvas);
+  const tesseractOK = text.length > 60 && confidence >= 65;
+  window.lastExtractionPath       = tesseractOK ? 'tesseract' : 'vision';
+  window.lastExtractionConfidence = tesseractOK ? confidence  : null;
+
+  domCache.countdownLabel.innerText = tesseractOK
+    ? `LOCAL OCR ✓ (${Math.round(confidence)}% conf) — STRUCTURING...`
+    : `OCR FALLBACK — VISION MODE...`;
+
+  // Step 2: Build images/text payload
+  let imagesPayload = [];
+  if (twoSidedModeActive && frontImageBuffer) {
+    imagesPayload = [frontImageBuffer, backImageUri];
+    ephemeralImageCache = backImageUri;
+    domCache.cachedImgView.src = frontImageBuffer;
+  } else {
+    imagesPayload = [backImageUri];
+    ephemeralImageCache = backImageUri;
+    domCache.cachedImgView.src = backImageUri;
+  }
+
+  const payload = {
+    rawText:       tesseractOK ? text : '',
+    imagesBase64:  tesseractOK ? [] : imagesPayload,
+    ecosystem:     domCache.ecosystemTarget.value,
+    location:      domCache.locationMet.value.trim(),
+    keywords:      domCache.customKeywords.value.trim()
+  };
+
+  if (burstModeActive) {
+    showViewportToast('CAPTURE QUEUED — PROCESSING IN BACKGROUND');
+    resetSystemToScanMode();
+  }
+
+  try {
+    const { data: { session: freshSession } } = await sbClient.auth.getSession();
+    activeSession = freshSession;
+    if (!activeSession?.access_token) throw new Error('Session expired. Re-authorize.');
+    
+    const res  = await fetch(CLOUD_FUNCTION_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'apikey':         SUPABASE_PUBLIC_ANON_KEY,
+        'Authorization': `Bearer ${activeSession.access_token}`
+      },
+      body: JSON.stringify(payload)
+    });
+    const fd = await res.json();
+    if (!res.ok) throw new Error(fd.error || `HTTP ${res.status}`);
+    if (!fd.success) throw new Error(fd.error || 'Extraction failed');
+
+    const profile = fd.profile || {};
+    window.lastIngestedProfile = profile;
+
+    if (burstModeActive) { appendSessionLogCard(profile); return; }
+
+    // Step 3: Duplicate check before opening review overlay
+    domCache.countdownLabel.innerText = 'CHECKING FOR DUPLICATES...';
+    const dupes = await checkDuplicates(profile.email, profile.name);
+
+    if (dupes.length > 0) {
+      showDuplicateOverlay(dupes, profile);
+      domCache.viewframe.className = 'viewfinder-wrapper';
+    } else {
+      openReviewOverlay(profile);
+    }
+
+  } catch (err) {
+    showViewportToast(`INGESTION FAULT: ${err.message}`);
+    if (!burstModeActive) resetSystemToScanMode();
+  }
+}
+
+function openReviewOverlay(profile) {
+  domCache.dynamicAIFields.innerHTML = '';
+  CANONICAL_SCHEMA.forEach(field => {
+    const v = fmt(profile[field.key] || '');
+    const grp = document.createElement('div');
+    grp.className = 'input-group';
+    grp.innerHTML = `<label>${field.label}</label>
+      <input type="text" id="canonical_${field.key}" value="${v||''}" class="hud-in">`;
+    domCache.dynamicAIFields.appendChild(grp);
+  });
+
+  domCache.connectionRationale.value = '';
+  domCache.nextAction.value          = '';
+  domCache.followUpAt.value          = getDefaultFollowUpDate();
+  document.getElementById('review_keywords').value = domCache.customKeywords.value.trim();
+
+  forceOverlayScrollReset();
+  domCache.reviewOverlay.style.display = 'flex';
+}
+
+// ── Commit ─────────────────────────────────────────────────
+async function executeVerifiedCommit() {
+  // Declare all canonical fields from DOM (fixes the v7 undefined-variable bug)
+  const fullName    = document.getElementById('canonical_name')?.value.trim()      || '';
+  const updatedEmail = document.getElementById('canonical_email')?.value.trim()    || '';
+  const jobTitle    = document.getElementById('canonical_title')?.value.trim()     || '';
+  const companyNode = document.getElementById('canonical_company')?.value.trim()   || '';
+
+  if (!fullName && !updatedEmail) {
+    showViewportToast('NAME OR EMAIL REQUIRED');
+    return;
+  }
+
+  // E.164 phone normalization
+  const rawPhone = document.getElementById('canonical_phone')?.value.trim() || '';
+  let e164Phone  = rawPhone;
+  if (rawPhone && window.libphonenumber) {
+    try {
+      const parsed = libphonenumber.parsePhoneNumberFromString(rawPhone, 'US');
+      if (parsed?.isValid()) e164Phone = parsed.number;
+    } catch { e164Phone = rawPhone; }
+  }
+
+  // Keywords: merge session + review panel
+  const reviewKws  = document.getElementById('review_keywords')?.value.trim() || '';
+  const sessionKws = domCache.customKeywords?.value.trim() || '';
+  const combined   = [reviewKws, sessionKws].filter(Boolean).join(', ');
+  const kws        = normalizeKeywords(combined);
+
+  // Build initial notes_thread entry
+  const scanNote = JSON.stringify([{
+    type:      'scan',
+    note:      `Scanned at ${domCache.locationMet?.value?.trim() || 'location not set'}.`,
+    author:    'OPERATOR_AURALENS',
+    timestamp: new Date().toISOString()
+  }]);
+
+  // Build metadata
+  const meta = JSON.stringify({
+    kernel_version:        '8.0',
+    scan_mode:             twoSidedModeActive ? 'DUAL_SIDED' : 'SINGLE_SIDED',
+    extraction_engine:     window.lastExtractionPath      || 'vision',
+    extraction_confidence: window.lastExtractionConfidence || null,
+    card_sides_captured:   twoSidedModeActive ? 2 : 1
+  });
+
+  const payload = {
+    // Card extraction
+    email:            updatedEmail || null,
+    full_name:        fullName,
+    job_title:        jobTitle     || null,
+    company_node:     companyNode  || null,
+    phone:            e164Phone    || null,
+    website:          document.getElementById('canonical_website')?.value.trim()   || null,
+    address:          document.getElementById('canonical_address')?.value.trim()   || null,
+    instagram_handle: document.getElementById('canonical_instagram')?.value.trim() || null,
+    linkedin_url:     document.getElementById('canonical_linkedin')?.value.trim()  || null,
+
+    // Session context
+    ecosystem_target: domCache.ecosystemTarget?.value || 'NMC',
+    location_met:     domCache.locationMet?.value?.trim()   || null,
+    encounter_date:   domCache.encounterDate?.value || todayISO(),
+    custom_keywords:  kws.length ? kws : null,
+
+    // CRM classification
+    contact_tier:           parseInt(document.getElementById('crm_tier')?.value || '4'),
+    relationship_status:    document.getElementById('crm_relationship_status')?.value || 'active',
+    pitch_affinity:         getSelectedAffinities(),
+    preferred_comm_channel: document.getElementById('crm_preferred_comm')?.value || null,
+
+    // Operator notes
+    connection_rationale: domCache.connectionRationale?.value?.trim() || null,
+    next_action:          domCache.nextAction?.value?.trim()           || null,
+    follow_up_at:         domCache.followUpAt?.value || getDefaultFollowUpDate(),
+
+    // System fields
+    ingestion_source:  'auralens_scan',
+    validation_status: 'APPROVED',
+    updated_at:        new Date().toISOString(),
+    notes_thread:      scanNote,
+    metadata:          meta
+  };
+
+  const { error } = await sbClient
+    .from('platform_contacts')
+    .upsert(payload, { onConflict: 'email' });
+
+  if (error) { showViewportToast(`COMMIT FAULT: ${error.message}`); return; }
+
+  // Update keyword cache with any new tags
+  if (kws.length) {
+    kws.forEach(t => { if (!keywordCache.includes(t)) keywordCache.push(t); });
+    keywordCache.sort();
+    renderKeywordChips();
+  }
+
+  showViewportToast(`CONFIRMED: ${fullName.toUpperCase()}`);
+  appendSessionLogCard({ name: fullName, title: jobTitle, company: companyNode, email: updatedEmail });
+  resetSystemToScanMode();
+}
+
+// ── UI Helpers ─────────────────────────────────────────────
+function showViewportToast(msg) {
+  const t = document.getElementById('viewportToast');
+  t.innerText = msg; t.classList.add('active');
+  setTimeout(() => t.classList.remove('active'), 3200);
+}
+
+function appendSessionLogCard(profile) {
+  const c = document.getElementById('sessionLogContainer');
+  if (c.children.length===1 && c.children[0].innerText.includes('No entries')) c.innerHTML = '';
+  const name    = fmt(profile.name    || 'Unknown');
+  const title   = fmt(profile.title   || '');
+  const company = fmt(profile.company || '');
+  const email   = (profile.email || 'No Email').toLowerCase();
+  const time    = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const card = document.createElement('div');
+  card.style.cssText = 'background:rgba(255,255,255,.03);border:1px solid var(--border-color);border-radius:6px;padding:10px;font-size:.7rem';
+  card.innerHTML = `
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+      <span style="font-weight:700;color:#FFF">${name}</span>
+      <span style="color:var(--accent-silver);font-size:.6rem">${time}</span>
+    </div>
+    <div style="color:var(--text-muted);font-size:.65rem">${title?title+' • ':''}${company}</div>
+    <div style="color:var(--accent-green);font-size:.6rem;margin-top:2px">${email}</div>`;
+  c.prepend(card);
+}
+
+function resetSystemToScanMode() {
+  forceOverlayScrollReset();
+  domCache.reviewOverlay.style.display = 'none';
+  document.getElementById('duplicateOverlay').style.display = 'none';
+  domCache.viewframe.className = 'viewfinder-wrapper';
+  domCache.huntingControlBtn.className = 'btn-hunting hud-btn';
+  domCache.huntingControlBtn.innerText = 'Engage Scan Mode';
+  frontImageBuffer = null;
+  pendingDuplicates = []; pendingProfile = null; pendingMergeId = null;
+  window.lastIngestedProfile = null;
+  if (twoSidedModeActive) updateTrackUI();
+}
+</script>
