@@ -127,6 +127,13 @@
             border:1px dashed var(--accent-red);border-radius:4px;margin-bottom:8px;
             font-weight:700;text-transform:uppercase;letter-spacing:.5px;
         }
+    
+/* dark scrollbars: barely lighter than the black page, gray thumb */
+* { scrollbar-width: thin; scrollbar-color: #3A3A3A #101010; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #101010; }
+::-webkit-scrollbar-thumb { background: #3A3A3A; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #4A4A4A; }
     </style>
     <script src="https://unpkg.com/libphonenumber-js@1.10.51/bundle/libphonenumber-max.js"></script>
 </head>
