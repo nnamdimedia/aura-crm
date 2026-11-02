@@ -958,45 +958,7 @@ async function commitToDatabase(addendumSigned) {
             const fullContactName = `${sanitizedPayload.first_name} ${sanitizedPayload.last_name}`;
             const fullAddr        = `${sanitizedPayload.street_address||''}${sanitizedPayload.address_2 ? ' '+sanitizedPayload.address_2 : ''}, ${sanitizedPayload.city||''}, ${sanitizedPayload.state_province_region||''} ${sanitizedPayload.postal_zip_code||''}`;
 
-            // Write to platform_contacts with full schema
-            await fetch(`${SB_URL}/rest/v1/platform_contacts?apikey=${SB_KEY}`, {
-                method: 'POST',
-                headers: {
-                    'apikey':        SB_KEY,
-                    'Authorization': `Bearer ${SB_KEY}`,
-                    'Content-Type':  'application/json',
-                    'Prefer':        'resolution=merge-duplicates'
-                },
-                body: JSON.stringify({
-                    full_name:            fullContactName,
-                    email:                sanitizedPayload.email,
-                    phone:                sanitizedPayload.phone_number,
-                    address:              fullAddr,
-                    website:              sanitizedPayload.portfolio_url,
-                    location_met:         `Production Session (${sanitizedPayload.production_date})`,
-                    encounter_date:       sanitizedPayload.production_date,
-                    ecosystem_target:     'NMC',
-                    ingestion_source:     'manual_entry',
-                    relationship_status:  'active',
-                    contact_tier:         3,
-                    pitch_affinity:       ['personal_marketing'],
-                    connection_rationale: `Model Release executed — ${computedClassification} / ${countryKey}`,
-                    notes_thread:         JSON.stringify([{
-                        type:      'scan',
-                        note:      `Model Release executed. Classification: ${computedClassification}. AI Addendum: ${isMinor ? 'Deferred (minor)' : (addendumSigned ? 'Signed' : 'Declined')}.`,
-                        author:    'AURARELEASE_SYSTEM',
-                        timestamp: now
-                    }]),
-                    metadata: JSON.stringify({
-                        kernel_version:    '2.0',
-                        source:            'aurarelease',
-                        classification:    computedClassification,
-                        jurisdiction:      countryKey,
-                        ai_addendum:       isMinor ? 'deferred' : (addendumSigned ? 'signed' : 'declined')
-                    }),
-                    updated_at: now
-                })
-            });
+            // CRM contact is created server-side by the release function (public key can no longer write contacts)
 
             document.getElementById('successModal').style.display = 'flex';
             setStateBadge('');
