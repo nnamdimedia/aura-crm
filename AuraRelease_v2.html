@@ -134,6 +134,18 @@
 ::-webkit-scrollbar-track { background: #101010; }
 ::-webkit-scrollbar-thumb { background: #3A3A3A; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #4A4A4A; }
+    
+/* tall reading area for the AI addendum and guardian review overlays */
+#addendumOverlay .legal-modal-content,
+#guardianSigningOverlay .legal-modal-content { height: 100%; max-height: 100%; overflow-y: auto; }
+#addendumOverlay .legal-modal-header,
+#guardianSigningOverlay .legal-modal-header,
+#addendumOverlay .legal-modal-footer,
+#guardianSigningOverlay .legal-modal-footer { flex: 0 0 auto; }
+#addendumOverlay .legal-modal-body,
+#guardianSigningOverlay .legal-modal-body { flex: 0 0 58vh; }
+#addendumOverlay .sig-container,
+#guardianSigningOverlay .sig-container { aspect-ratio: 3 / 1; }
     </style>
     <script src="https://unpkg.com/libphonenumber-js@1.10.51/bundle/libphonenumber-max.js"></script>
 </head>
@@ -312,7 +324,7 @@
     <div class="legal-modal-content">
         <div class="legal-modal-header">
             <div class="legal-modal-title" id="guardian_modal_badge">GUARDIAN CONTRACT REVIEW</div>
-            <div style="font-size:.6rem;color:var(--accent-green);margin-top:6px;letter-spacing:1px">STEP 4 OF 5 — GUARDIAN AUTHORIZATION</div>
+            <div style="font-size:.6rem;color:var(--accent-green);margin-top:6px;letter-spacing:1px">STEP 4 OF 5 — READ TO THE END, THEN SIGN BELOW</div>
         </div>
         <div class="legal-modal-body" id="guardian_contract_viewport">
             Loading contract terms…
@@ -342,7 +354,7 @@
     <div class="legal-modal-content">
         <div class="legal-modal-header">
             <div class="legal-modal-title">AI USE DISCLOSURE &amp; CONSENT<br><span style="font-size:.65rem;color:var(--accent-muted-silver)">ADDENDUM TO MODEL RELEASE</span></div>
-            <div style="font-size:.6rem;color:var(--accent-green);margin-top:6px;letter-spacing:1px">STEP 2 OF 2 — AI DISCLOSURE</div>
+            <div style="font-size:.6rem;color:var(--accent-green);margin-top:6px;letter-spacing:1px">STEP 2 OF 2 — READ TO THE END, THEN SIGN BELOW</div>
         </div>
         <div class="legal-modal-body" id="addendum_viewport">
             <div class="legal-section-header">1. Disclosed AI Uses</div>
@@ -587,6 +599,7 @@ function initializeFormEngine() {
             guardianNotice.style.display = 'none';
             guardianGateN.style.display  = 'none';
             guardianSigCont.classList.remove('locked');
+            guardianSigCont.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             guardianResetB.disabled   = false;
             guardianExecBtn.disabled  = false;
         }
@@ -604,6 +617,7 @@ function initializeFormEngine() {
             addendumNotice.style.display = 'none';
             addendumGateN.style.display  = 'none';
             addendumSigCont.classList.remove('locked');
+            addendumSigCont.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             addendumResetB.disabled  = false;
             addendumExecBtn.disabled = false;
         }
